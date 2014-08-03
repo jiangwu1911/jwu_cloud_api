@@ -1,18 +1,20 @@
+# -*- coding: UTF-8 -*-
+
 from sqlalchemy import Column, Integer, Sequence, String, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 import utils
 
 Base = declarative_base()
 
 class User(Base):
     __tablename__ = 'user'
-    id = Column(String(50), primary_key=True)
+    id = Column(String(100), primary_key=True)
     name = Column(String(50), nullable=False)
     password = Column(String(50), nullable=False)
     email = Column(String(100))
     enabled = Column(Integer, default=1, nullable=False)
     dept_id = Column(Integer, default=-1, nullable=False)
-    role_ids = Column(String(200))
 
     def __init__(self, name='', password='', email='', enabled=0, dept_id=0):
         self.id = utils.get_uuid()
@@ -34,7 +36,7 @@ class User(Base):
 
 class Role(Base):
     __tablename__ = 'role'
-    id = Column(String(50), primary_key=True)
+    id = Column(String(100), primary_key=True)
     name = Column(String(50), nullable=False)
     desc = Column(String(200))
 
@@ -52,12 +54,12 @@ class Role(Base):
 
 class Dept(Base):
     __tablename__ = 'dept'
-    id = Column(String(50), primary_key=True)
+    id = Column(String(100), primary_key=True)
     name = Column(String(50), nullable=False)
     desc = Column(String(200))
-    parent_dept_id = Column(Integer)
+    parent_dept_id = Column(String(50))
     
-    def __init__(self, name='', desc='', parent_dept_id=-1):
+    def __init__(self, name='', desc='', parent_dept_id=''):
         self.id = utils.get_uuid()
         self.name = name
         self.desc = desc
@@ -73,7 +75,7 @@ class Dept(Base):
 
 class Permission(Base):
     __tablename__ = 'permission'
-    id = Column(String(50), primary_key=True)
+    id = Column(String(100), primary_key=True)
     name = Column(String(50), nullable=False)
     role_id = Column(Integer, nullable=False)
     operation = Column(String(100), nullable=False)
@@ -97,7 +99,7 @@ class Permission(Base):
 
 class Token(Base):
     __tablename__ = 'token'
-    id = Column(String(50), primary_key=True)
+    id = Column(String(100), primary_key=True)
     expires = Column('expires', DateTime)
     user_id = Column(Integer)
 
@@ -112,3 +114,14 @@ class Token(Base):
                   self.expires,
                   self.user_id))
 
+
+def init_db(engine):
+    Session = sessionmaker(engine)
+    session = Session()
+
+    dept = Dept(name='Head Office', desc='Head Office')
+    session.add(dept)
+    user = User(name='admin', password='admin', dept_id=dept.id)
+    session.add(user)
+
+    session.commit()
