@@ -19,7 +19,7 @@ class JsonTestCase(unittest.TestCase):
         return session
         
 
-    def test_encode(self):
+    def test_user_encode(self):
         session = self._create_session()
         results = session.query(User)
         str = sql_results_to_json(results, 'users')
