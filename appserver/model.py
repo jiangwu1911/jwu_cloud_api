@@ -16,7 +16,7 @@ class User(Base):
     enabled = Column(Integer, default=1, nullable=False)
     dept_id = Column(String(100), nullable=False)
 
-    def __init__(self, name='', password='', email='', enabled=0, dept_id=0):
+    def __init__(self, name='', password='', email='', enabled=0, dept_id=''):
         self.id = utils.get_uuid()
         self.name = name
         self.password = password

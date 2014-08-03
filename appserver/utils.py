@@ -8,9 +8,8 @@ def get_uuid():
 class JsonEncoder(json.JSONEncoder):
     def default(self,obj):
         d = {}
-        d['__class__'] = obj.__class__.__name__
-        #d['__module__'] = obj.__module__
-        d.update(obj.__dict__)
+        d[obj.__class__.__name__] = {}
+        d[obj.__class__.__name__].update(obj.__dict__)
         return d
 
 

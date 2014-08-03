@@ -14,4 +14,4 @@ def define_route(app):
     def list_user(db):
         users = db.query(model.User)
         for user in users:
-            return utils.JsonEncoder().encode(user)
+            return user
