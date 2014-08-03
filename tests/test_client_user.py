@@ -3,22 +3,18 @@ import unittest
 import json
 import httplib2
 from urllib import urlencode
+import base
 
 
-BASE_URL='http://localhost:8080/'
-SERVER_PORT=80
-TIMEOUT=30
-TEST_TOKEN="ece83cbdac1b43bb9dac367e25b3aa16"
-
-class UserTestCase(unittest.TestCase):
+class UserTestCase(base.BaseTestCase):
     def test_list_user(self):
+        token = self.get_token()
         h = httplib2.Http() 
-        resp, content = h.request(BASE_URL + "user",
+        resp, content = h.request(self.base_url + "user",
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
-                                           'X-Auth-Token': TEST_TOKEN}
+                                           'X-Auth-Token': token}
                                  )  
-        #print resp  
         print json.loads(content)
 
 

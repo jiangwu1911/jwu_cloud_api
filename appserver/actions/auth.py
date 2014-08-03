@@ -14,7 +14,7 @@ def login(request, db):
     password = request.forms.get('password')
     if check_login(db, username, password):
         token = generate_token(db, username)
-        return {'success': {'token': token.value}}
+        return {'success': {'token': token.id}}
     else:
         return {'error': 'Login failed.'}
 
@@ -37,7 +37,7 @@ def check_login(db, username='', password=''):
 def generate_token(db, username):
     token = model.Token()
     user = db.query(model.User).filter_by(name=username).first()
-    token.value = _generate_uuid_token()
+    token.id = _generate_uuid_token()
     token.expires = datetime.datetime.now() + datetime.timedelta(seconds=conf.token_expires)
     token.user_id = user.id
     db.add(token)
