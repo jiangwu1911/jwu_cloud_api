@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import sys
 import unittest
 import json
@@ -8,7 +10,7 @@ import base
 
 class UserTestCase(base.BaseTestCase):
     def test_list_user(self):
-        token = self.get_token()
+        token = self.get_token('熊大', 'abc123')
         h = httplib2.Http() 
         resp, content = h.request(self.base_url + "user",
                                   "GET",

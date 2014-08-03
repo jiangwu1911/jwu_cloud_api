@@ -9,7 +9,7 @@ import base
 
 class LoginTestCase(base.BaseTestCase):
     def test_login(self):
-        token = self.get_token()
+        token = self.get_token('admin', 'admin')
         print token
 
 

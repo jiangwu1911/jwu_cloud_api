@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 from sqlalchemy import Column, Integer, Sequence, String, Text, DateTime, Unicode
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -57,7 +55,7 @@ class Dept(Base):
     id = Column(String(100), primary_key=True)
     name = Column(String(50), nullable=False)
     desc = Column(String(200))
-    parent_dept_id = Column(String(50))
+    parent_dept_id = Column(String(100))
     
     def __init__(self, name='', desc='', parent_dept_id=''):
         self.id = utils.get_uuid()
@@ -113,15 +111,3 @@ class Token(Base):
                % (self.id,
                   self.expires,
                   self.user_id))
-
-
-def init_db(engine):
-    Session = sessionmaker(engine)
-    session = Session()
-
-    dept = Dept(name=u'总部', desc='公司总部')
-    session.add(dept)
-    user = User(name='admin', password=utils.md5encode('admin'), dept_id=dept.id)
-    session.add(user)
-
-    session.commit()

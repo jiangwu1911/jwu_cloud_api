@@ -11,9 +11,9 @@ from appserver.utils import md5encode
 class BaseTestCase(unittest.TestCase):
     base_url = 'http://localhost:8080/'
 
-    def get_token(self):
+    def get_token(self, username, password):
         h = httplib2.Http() 
-        data = {'username': 'admin', 'password': md5encode('admin')}
+        data = {'username': username, 'password': md5encode(password)}
         resp, content = h.request(self.base_url + "login",
                                   "POST",
                                   urlencode(data), 
