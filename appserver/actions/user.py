@@ -9,5 +9,4 @@ log = logging.getLogger("cloudapi")
 
 @pre_check
 def list_user(request, db):
-    results = db.query(model.User)
-    return utils.sql_results_to_json(results, 'users') 
+    pass

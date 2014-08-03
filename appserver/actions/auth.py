@@ -1,6 +1,7 @@
 import logging
 from bottle import request
-import model
+from model import User
+from model import Token
 import datetime
 import utils
 
@@ -20,7 +21,7 @@ def login(request, db):
 
 
 def check_login(db, username='', password=''):
-    user = db.query(model.User).filter_by(name=username).first()
+    user = db.query(User).filter(User.name==username).first()
     if user == None:
         log.debug('Cannot find user %s.' % username)
         return False
@@ -35,8 +36,8 @@ def check_login(db, username='', password=''):
 
 
 def generate_token(db, username):
-    token = model.Token()
-    user = db.query(model.User).filter_by(name=username).first()
+    token = Token()
+    user = db.query(User).filter(User.name==username).first()
     token.id = _generate_uuid_token()
     token.expires = datetime.datetime.now() + datetime.timedelta(seconds=conf.token_expires)
     token.user_id = user.id

@@ -17,6 +17,9 @@ import data
 
 VERSION ="0.1"
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 def init_log():
     logging.config.fileConfig("logging.conf")

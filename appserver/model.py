@@ -14,7 +14,7 @@ class User(Base):
     enabled = Column(Integer, default=1, nullable=False)
     dept_id = Column(String(100), nullable=False)
 
-    def __init__(self, name='', password='', email='', enabled=0, dept_id=''):
+    def __init__(self, name='', password='', email='', enabled=1, dept_id=''):
         self.id = utils.get_uuid()
         self.name = name
         self.password = password
@@ -64,12 +64,28 @@ class Dept(Base):
         self.parent_dept_id = parent_dept_id
     
     def __repr__(self):
-        return("<Dept('%s', '%s', '%s', %d)>"
+        return("<Dept('%s', '%s', '%s', '%s')>"
                % (self.id,
                   self.name,
                   self.desc,
                   self.parent_dept_id))
- 
+
+
+class UserRoleMembership(Base):
+    __tablename__ = 'user_role_membership'
+    id = Column(Integer, Sequence('membership_id_seq'), primary_key=True)
+    user_id = Column(String(100), nullable=False)
+    role_id = Column(String(100), nullable=False)
+    
+    def __init__(self, user_id='', role_id=''):
+        self.user_id = user_id
+        self.role_id = role_id
+
+    def __repr__(self):
+        return("<UserRoleMembership('%s', '%s')>"
+               % (self.user_id,
+                  self.role_id))
+
 
 class Permission(Base):
     __tablename__ = 'permission'
@@ -87,7 +103,7 @@ class Permission(Base):
         self.is_permit = is_permit
 
     def __repr__(self):
-        return("<Permission('%s', '%s', %d, '%s', %d)>"
+        return("<Permission('%s', '%s', '%s', '%s', %d)>"
                % (self.id,
                   self.name,
                   self.role_id,

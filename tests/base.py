@@ -16,7 +16,7 @@ class BaseTestCase(unittest.TestCase):
         data = {'username': username, 'password': md5encode(password)}
         resp, content = h.request(self.base_url + "login",
                                   "POST",
-                                  urlencode(data), 
-                                  headers={'Content-Type': 'application/x-www-form-urlencoded'})  
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded'})
         result = json.loads(content)
         return result['success']['token']
