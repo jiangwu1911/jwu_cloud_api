@@ -1,8 +1,8 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 import logging
 import logging.config
+import sys
 
 from bottle import Bottle, run
 from bottle import get, post, request
@@ -13,6 +13,9 @@ from paste import httpserver
 import settings as conf
 import model
 import auth 
+
+
+VERSION ="0.1"
 
 
 def init_log():
@@ -36,13 +39,29 @@ def install_db_plugin(app):
     app.install(plugin)
 
 
-init_log()
-app = Bottle()
-install_db_plugin(app)
+def define_route(app):
+    @app.post('/login')
+    def login(db):
+        return auth.login(request, db)
 
-#@route('/login', method = 'POST')
-@app.post('/login')
-def login(db):
-    return auth.login(request, db)
 
-httpserver.serve(app, host=conf.listen_ip, port=conf.listen_port)
+def start_server():
+    init_log()
+    app = Bottle()
+    install_db_plugin(app)
+    define_route(app)
+    httpserver.serve(app, host=conf.listen_ip, port=conf.listen_port)
+
+
+def main():
+    from optparse import OptionParser
+
+    usage = "Usage: %prog [options]"
+    parser = OptionParser(usage, version=VERSION)
+    options, args = parser.parse_args()
+    
+    start_server()
+
+
+if __name__ == "__main__":
+    main()

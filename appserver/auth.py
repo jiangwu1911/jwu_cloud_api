@@ -2,7 +2,7 @@ import logging
 from bottle import get, post, request
 import model
 import datetime
-import uuid
+import utils
 
 import settings as conf
 
@@ -45,4 +45,4 @@ def generate_token(db, username):
 
 
 def _get_uuid_token():
-    return uuid.uuid4().hex
+    return utils.get_uuid()
