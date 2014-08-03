@@ -90,24 +90,24 @@ class UserRoleMembership(Base):
 class Permission(Base):
     __tablename__ = 'permission'
     id = Column(String(100), primary_key=True)
-    name = Column(String(50), nullable=False)
-    role_id = Column(Integer, nullable=False)
-    operation = Column(String(100), nullable=False)
+    role_id = Column(String(100), nullable=False)
+    url = Column(String(500), nullable=False)
+    method = Column(String(20), nullable=False)
     is_permit = Column(Integer, default=1, nullable=False)
 
-    def __init__(self, name='', role_id=0, operation='', is_permit=1):
+    def __init__(self, url='', role_id='', method='', is_permit=1):
         self.id = utils.get_uuid()
-        self.name = name
-        self.role_id = role__id
-        self.operation = operation
+        self.role_id = role_id
+        self.url = url
+        self.method = method
         self.is_permit = is_permit
 
     def __repr__(self):
         return("<Permission('%s', '%s', '%s', '%s', %d)>"
                % (self.id,
-                  self.name,
                   self.role_id,
-                  self.operation,
+                  self.url,
+                  self.method,
                   self.is_permit))
 
 

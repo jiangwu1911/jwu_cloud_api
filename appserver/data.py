@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from model import Dept
 from model import User
 from model import Role
+from model import Permission
 from model import UserRoleMembership
 import utils
 
@@ -76,5 +77,11 @@ def insert_test_data(engine):
     session.add(UserRoleMembership(user6.id, admin_role.id))
     session.add(UserRoleMembership(user7.id, user_role.id))
     session.add(UserRoleMembership(user8.id, user_role.id))
+
+    session.add(Permission(url='/dept', role_id=admin_role.id, method='GET'))
+    session.add(Permission(url='/dept', role_id=admin_role.id, method='PUT'))
+    session.add(Permission(url='/dept', role_id=admin_role.id, method='POST'))
+    session.add(Permission(url='/dept', role_id=admin_role.id, method='DELETE'))
+    session.add(Permission(url='/dept', role_id=user_role.id, method='DELETE'))
 
     session.commit()
