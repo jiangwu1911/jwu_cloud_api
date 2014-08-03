@@ -2,7 +2,6 @@
 
 import logging
 from sqlalchemy import or_
-from bottle import request
 
 from model import Dept
 from model import User
@@ -15,9 +14,9 @@ log = logging.getLogger("cloudapi")
 
 
 @pre_check
-def list_dept(request, db):
+def list_dept(req, db):
     """Return all dept and sub depts"""
-    user_id = get_userid_by_token(db)
+    user_id = get_userid_by_token(req, db)
     if user_id == None:
         return {'error': 'Invalid token'}
     

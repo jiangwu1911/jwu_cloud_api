@@ -5,10 +5,10 @@ import unittest
 import json
 import httplib2
 from urllib import urlencode
-import base
+from test_base import BaseTestCase
 
 
-class UserTestCase(base.BaseTestCase):
+class UserTestCase(BaseTestCase):
     def test_list_user(self):
         token = self.get_token('熊大', 'abc123')
         h = httplib2.Http() 

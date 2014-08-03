@@ -4,10 +4,10 @@ import json
 import httplib2
 from urllib import urlencode
 
-import base
+from test_base import BaseTestCase
 
 
-class LoginTestCase(base.BaseTestCase):
+class LoginTestCase(BaseTestCase):
     def test_login(self):
         token = self.get_token('admin', 'admin')
         print token

@@ -1,5 +1,4 @@
 import logging
-from bottle import request
 from model import User
 from model import Token
 import datetime
@@ -10,9 +9,9 @@ import settings as conf
 log = logging.getLogger("cloudapi")
 
 
-def login(request, db):
-    username = request.forms.get('username')
-    password = request.forms.get('password')
+def login(req, db):
+    username = req.forms.get('username')
+    password = req.forms.get('password')
     if check_login(db, username, password):
         token = generate_token(db, username)
         return {'success': {'token': token.id}}

@@ -91,14 +91,14 @@ class Permission(Base):
     __tablename__ = 'permission'
     id = Column(String(100), primary_key=True)
     role_id = Column(String(100), nullable=False)
-    url = Column(String(500), nullable=False)
+    path = Column(String(500), nullable=False)
     method = Column(String(20), nullable=False)
     is_permit = Column(Integer, default=1, nullable=False)
 
-    def __init__(self, url='', role_id='', method='', is_permit=1):
+    def __init__(self, path='', role_id='', method='', is_permit=1):
         self.id = utils.get_uuid()
         self.role_id = role_id
-        self.url = url
+        self.path = path
         self.method = method
         self.is_permit = is_permit
 
@@ -106,7 +106,7 @@ class Permission(Base):
         return("<Permission('%s', '%s', '%s', '%s', %d)>"
                % (self.id,
                   self.role_id,
-                  self.url,
+                  self.path,
                   self.method,
                   self.is_permit))
 

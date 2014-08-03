@@ -6,12 +6,12 @@ import json
 import httplib2
 from urllib import urlencode
 
-import base
+from test_base import BaseTestCase
 sys.path.append("..")
 import appserver.model
 
 
-class DeptTestCase(base.BaseTestCase):
+class DeptTestCase(BaseTestCase):
     def test_list_dept(self):
         token = self.get_token('熊大', 'abc123')
         h = httplib2.Http() 
@@ -21,9 +21,7 @@ class DeptTestCase(base.BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )  
-        data = json.loads(content)
-        for d in data['depts']:
-            print d['name']
+        print content
 
 
 if __name__ == "__main__":

@@ -78,10 +78,10 @@ def insert_test_data(engine):
     session.add(UserRoleMembership(user7.id, user_role.id))
     session.add(UserRoleMembership(user8.id, user_role.id))
 
-    session.add(Permission(url='/dept', role_id=admin_role.id, method='GET'))
-    session.add(Permission(url='/dept', role_id=admin_role.id, method='PUT'))
-    session.add(Permission(url='/dept', role_id=admin_role.id, method='POST'))
-    session.add(Permission(url='/dept', role_id=admin_role.id, method='DELETE'))
-    session.add(Permission(url='/dept', role_id=user_role.id, method='DELETE'))
+    session.add(Permission(path='^/dept$', role_id=admin_role.id, method='GET'))
+    session.add(Permission(path='^/dept$', role_id=admin_role.id, method='PUT'))
+    session.add(Permission(path='^/dept$', role_id=admin_role.id, method='POST'))
+    session.add(Permission(path='^/dept$', role_id=admin_role.id, method='DELETE'))
+    session.add(Permission(path='^/dept$', role_id=user_role.id, method='GET'))
 
     session.commit()
