@@ -1,6 +1,10 @@
 import logging
 from bottle import get, post, request
 import model
+import datetime
+import uuid
+
+import settings as conf
 
 log = logging.getLogger("cloudapi")
 
@@ -9,9 +13,10 @@ def login(request, db):
     username = request.forms.get('username')
     password = request.forms.get('password')
     if check_login(db, username, password):
-        return '<p>Your login was correct</p>'
+        token = generate_token(db, username)
+        return {'access': {'token': token.value}}
     else:
-        return '<p>Login failed</p>'
+        return {'error': 'Login failed.'}
 
 
 def check_login(db, username='', password=''):
@@ -25,4 +30,19 @@ def check_login(db, username='', password=''):
                   % (username, password))
         return False
     
+    log.debug(user)
     return True
+
+
+def generate_token(db, username):
+    token = model.Token()
+    user = db.query(model.User).filter_by(name=username).first()
+    token.value = _get_uuid_token()
+    token.expires = datetime.datetime.now() + datetime.timedelta(seconds=conf.token_expires)
+    token.user_id = user.id
+    db.add(token)
+    return token
+
+
+def _get_uuid_token():
+    return uuid.uuid4().hex
