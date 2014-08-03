@@ -1,6 +1,7 @@
 from bottle import route, get, post, request
 
-import auth
+from actions import auth
+from actions import user
 import model
 import json
 import utils
@@ -12,6 +13,4 @@ def define_route(app):
 
     @app.get('/user')
     def list_user(db):
-        users = db.query(model.User)
-        for user in users:
-            return user
+        return user.list_user(request, db)
