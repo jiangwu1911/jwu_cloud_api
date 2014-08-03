@@ -121,7 +121,7 @@ def init_db(engine):
 
     dept = Dept(name=u'总部', desc='公司总部')
     session.add(dept)
-    user = User(name='admin', password='admin', dept_id=dept.id)
+    user = User(name='admin', password=utils.md5encode('admin'), dept_id=dept.id)
     session.add(user)
 
     session.commit()

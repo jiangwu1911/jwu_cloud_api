@@ -4,13 +4,16 @@ import json
 import httplib2
 from urllib import urlencode
 
+sys.path.append("..")
+from appserver.utils import md5encode
+
 
 class BaseTestCase(unittest.TestCase):
     base_url = 'http://localhost:8080/'
 
     def get_token(self):
         h = httplib2.Http() 
-        data = {'username':'admin', 'password':'admin'}
+        data = {'username': 'admin', 'password': md5encode('admin')}
         resp, content = h.request(self.base_url + "login",
                                   "POST",
                                   urlencode(data), 

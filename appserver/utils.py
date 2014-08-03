@@ -1,10 +1,15 @@
 import uuid
 import json
+import hashlib
 from sqlalchemy.ext.declarative import DeclarativeMeta  
 
 
 def get_uuid():
     return uuid.uuid4().hex
+
+
+def md5encode(str):
+    return hashlib.md5(str).hexdigest()
 
 
 def sql_results_to_json(results, name):
