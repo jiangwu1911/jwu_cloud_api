@@ -5,14 +5,13 @@ import logging.config
 import sys
 
 from bottle import Bottle, run
-from bottle import get, post, request
 from bottle.ext.sqlalchemy import SQLAlchemyPlugin
 from sqlalchemy import create_engine
 from paste import httpserver
 
 import settings as conf
 import model
-import auth 
+import urls
 
 
 VERSION ="0.1"
@@ -41,22 +40,16 @@ def install_db_plugin(app):
     app.install(plugin)
 
 
-def define_route(app):
-    @app.post('/login')
-    def login(db):
-        return auth.login(request, db)
-
-
 def start_server():
     init_log()
     app = Bottle()
     install_db_plugin(app)
-    define_route(app)
+    urls.define_route(app)
     httpserver.serve(app, host=conf.listen_ip, port=conf.listen_port)
 
 
 def init_db():
-    answer = raw_input("Do you really want to destroy all data in database: (yes|no)?")
+    answer = raw_input("Do you really want to destroy all data in database: (yes|no)? ")
     if answer == "yes":
         engine = create_db_engine()
         model.Base.metadata.drop_all(engine)

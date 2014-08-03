@@ -14,7 +14,7 @@ def login(request, db):
     password = request.forms.get('password')
     if check_login(db, username, password):
         token = generate_token(db, username)
-        return {'access': {'token': token.value}}
+        return {'success': {'token': token.value}}
     else:
         return {'error': 'Login failed.'}
 

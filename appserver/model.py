@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from sqlalchemy import Column, Integer, Sequence, String, Text, DateTime
+from sqlalchemy import Column, Integer, Sequence, String, Text, DateTime, Unicode
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import utils
@@ -14,7 +14,7 @@ class User(Base):
     password = Column(String(50), nullable=False)
     email = Column(String(100))
     enabled = Column(Integer, default=1, nullable=False)
-    dept_id = Column(Integer, default=-1, nullable=False)
+    dept_id = Column(String(100), nullable=False)
 
     def __init__(self, name='', password='', email='', enabled=0, dept_id=0):
         self.id = utils.get_uuid()
@@ -25,7 +25,7 @@ class User(Base):
         self.dept_id = dept_id
 
     def __repr__(self):
-        return ("<User('%s', '%s', '%s', '%s', %d, %d)>" 
+        return ("<User('%s', '%s', '%s', '%s', %d, '%s')>" 
                 % (self.id, 
                    self.name, 
                    self.password,
@@ -101,7 +101,7 @@ class Token(Base):
     __tablename__ = 'token'
     id = Column(String(100), primary_key=True)
     expires = Column('expires', DateTime)
-    user_id = Column(Integer)
+    user_id = Column(String(100))
 
     def __init__(self, expires=-1, user_id=0):
         self.id = utils.get_uuid()
@@ -119,7 +119,7 @@ def init_db(engine):
     Session = sessionmaker(engine)
     session = Session()
 
-    dept = Dept(name='Head Office', desc='Head Office')
+    dept = Dept(name=u'总部', desc='公司总部')
     session.add(dept)
     user = User(name='admin', password='admin', dept_id=dept.id)
     session.add(user)
