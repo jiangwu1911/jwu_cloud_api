@@ -109,7 +109,7 @@ class Token(Base):
         self.user_id = user_id
 
     def __repr__(self):
-        return("<Permission('%s', '%s', '%s')>"
+        return("<Token('%s', '%s', '%s')>"
                % (self.id,
                   self.expires,
                   self.user_id))
