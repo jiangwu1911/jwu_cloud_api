@@ -55,3 +55,17 @@ def define_route(app):
         response.content_type = "application/json"
         return user.show_user(request, db, user_id)
 
+    @app.post('/user')
+    def add_user(db):
+        response.content_type = "application/json"
+        return user.add_user(request, db)
+
+    @app.post('/user/:user_id')
+    def update_user(db, user_id):
+        response.content_type = "application/json"
+        return user.update_user(request, db, user_id)
+
+    @app.delete('/user/:user_id')
+    def delete_user(db, user_id):
+        response.content_type = "application/json"
+        return user.delete_user(request, db, user_id)

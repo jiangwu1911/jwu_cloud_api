@@ -4,6 +4,7 @@ import logging
 from model import Token
 from model import User
 from model import Dept
+from model import Role
 from model import UserRoleMembership
 from model import Permission
 import utils
@@ -68,7 +69,8 @@ def check_permission(req, db, context):
 
     membership = db.query(UserRoleMembership).filter(UserRoleMembership.user_id==user.id).first()
     if membership == None:
-        return False
+        raise PermissionDenyError()
+    context['membership'] = membership
 
     permissions = db.query(Permission).filter_by(role_id=membership.role_id, method=req.method)
     context['permissions'] = []
@@ -139,3 +141,8 @@ def get_required_input(req, varname):
     if value==None or value=='':
         raise EmptyVariableError(varname)
     return value
+
+
+def get_all_roles(db):
+    roles = db.query(Role)
+    return roles

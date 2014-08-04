@@ -47,8 +47,8 @@ class DeptNotFoundError(HTTPError):
 
 
 class DeptAlreadyExistError(HTTPError):
-    def __init__(self, dept_id):
-        msg = "Dept %s already exist" % dept_id
+    def __init__(self, dept_name):
+        msg = "Dept %s already exist" % dept_name
         super(DeptAlreadyExistError, self).__init__(400, msg)
 
 
@@ -75,3 +75,21 @@ class UserNotFoundError(HTTPError):
     def __init__(self, user_id):
         msg = "User %s not found or do not have permission" % user_id
         super(UserNotFoundError, self).__init__(404, msg)
+
+
+class UsernameAlreadyExistError(HTTPError):
+    def __init__(self, username):
+        msg = "Username %s already exist" % username
+        super(UsernameAlreadyExistError, self).__init__(400, msg)
+
+
+class EmailAlreadyExistError(HTTPError):
+    def __init__(self, email):
+        msg = "Email %s already exist" % email
+        super(EmailAlreadyExistError, self).__init__(400, msg)
+
+
+class RolePermissionDenyError(HTTPError):
+    def __init__(self, role_id):
+        msg = "You don't have permission to assign role %s to user" % (role_id)
+        super(RolePermissionDenyError, self).__init__(403, msg)

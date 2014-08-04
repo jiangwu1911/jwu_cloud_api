@@ -32,7 +32,7 @@ def insert_basic_data(engine):
                                      role_id=sys_admin_role.id)
     session.add(membership1)
 
-    session.flush()
+    session.commit()
 
 
 def insert_test_data(engine):
@@ -59,8 +59,10 @@ def insert_test_data(engine):
 
     user1 = User(name='熊大', password=utils.md5encode('abc123'), dept_id=dept1.id)
     user2 = User(name='熊二', password=utils.md5encode('abc123'), dept_id=dept2.id)
-    user3 = User(name='张三', password=utils.md5encode('abc123'), dept_id=dept1_1.id)
-    user4 = User(name='李四', password=utils.md5encode('abc123'), dept_id=dept1_2.id)
+    user3 = User(name='张三', password=utils.md5encode('abc123'), 
+                 email='zhangsan@test.com', dept_id=dept1_1.id)
+    user4 = User(name='李四', password=utils.md5encode('abc123'),
+                 email='lisi@test.com', dept_id=dept1_2.id)
     user5 = User(name='王五', password=utils.md5encode('abc123'), dept_id=dept2_1.id)
     user6 = User(name='赵六', password=utils.md5encode('abc123'), dept_id=dept2_2.id)
     user7 = User(name='用户1', password=utils.md5encode('abc123'), dept_id=dept1_1.id)
@@ -91,6 +93,8 @@ def insert_test_data(engine):
     session.add(UserRoleMembership(user6.id, dept_admin_role.id))
     session.add(UserRoleMembership(user7.id, user_role.id))
     session.add(UserRoleMembership(user8.id, user_role.id))
+    session.add(UserRoleMembership(user9.id, user_role.id))
+    session.add(UserRoleMembership(user10.id, user_role.id))
     session.flush()
 
     session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='GET'))
@@ -107,7 +111,13 @@ def insert_test_data(engine):
 
     session.add(Permission(path='^/user$', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/user/.*', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/user$', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/user/.*', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/user/.*', role_id=sys_admin_role.id, method='DELETE'))
 
     session.add(Permission(path='^/user$', role_id=dept_admin_role.id, method='GET'))
     session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='GET'))
-    session.flush()
+    session.add(Permission(path='^/user$', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='DELETE'))
+    session.commit()

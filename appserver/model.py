@@ -13,22 +13,25 @@ class User(Base):
     email = Column(String(100))
     enabled = Column(Integer, default=1, nullable=False)
     dept_id = Column(Integer)
+    deleted = Column(Integer, default=0, nullable=False)
 
-    def __init__(self, name='', password='', email='', enabled=1, dept_id=0):
+    def __init__(self, name='', password='', email='', enabled=1, dept_id=0, deleted=0):
         self.name = name
         self.password = password
         self.email = email
         self.enabled = enabled
         self.dept_id = dept_id
+        self.deleted = deleted
 
     def __repr__(self):
-        return ("<User(%d, '%s', '%s', '%s', %d, %d)>" 
+        return ("<User(%d, '%s', '%s', '%s', %d, %d, %d)>" 
                 % (self.id, 
                    self.name, 
                    self.password,
                    self.email,
                    self.enabled,
-                   self.dept_id))
+                   self.dept_id,
+                   self.deleted))
 
 
 class Role(Base):
@@ -54,7 +57,7 @@ class Dept(Base):
     name = Column(String(50), nullable=False)
     desc = Column(String(200))
     parent_dept_id = Column(Integer)
-    deleted = Column(Integer)
+    deleted = Column(Integer, default=0, nullable=False)
     
     def __init__(self, name='', desc='', parent_dept_id=0, deleted=0):
         self.name = name

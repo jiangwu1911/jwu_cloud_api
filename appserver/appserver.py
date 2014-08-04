@@ -8,6 +8,7 @@ import bottle
 from bottle import Bottle, run
 from bottle.ext.sqlalchemy import SQLAlchemyPlugin
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from paste import httpserver
 
 import settings as conf
@@ -41,10 +42,12 @@ def create_db_engine():
 
 def install_db_plugin(app):
     engine = create_db_engine()
+    create_session = sessionmaker(bind=engine)
     plugin = SQLAlchemyPlugin(engine, 
                               model.Base.metadata, 
                               create=True,
-                              commit=True)
+                              commit=True,
+                              create_session=create_session)
     app.install(plugin)
 
 

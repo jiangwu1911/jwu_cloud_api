@@ -34,11 +34,6 @@ def show_dept(req, db, context, dept_id):
 
 
 @pre_check
-def delete_dept(req, db, context):
-    pass 
-
-
-@pre_check
 def add_dept(req, db, context):
     name = get_required_input(req, 'name')
     desc = get_required_input(req, 'desc')
@@ -52,7 +47,7 @@ def add_dept(req, db, context):
 
     dept = Dept(name=name, desc=desc, parent_dept_id=parent_dept_id)
     db.add(dept)
-    db.flush()
+    db.commit()
     return one_line_sql_result_to_json(dept, 'dept')
 
 
@@ -71,14 +66,18 @@ def update_dept(req, db, context, dept_id):
     if is_dept_admin(context, dept_id) == False:
         raise NotDeptAdminError(dept_id)
 
-    if name: dept.name = name
+    if name: 
+        if db.query(Dept).filter(Dept.name==name, Dept.deleted==0, Dept.id!=dept_id).count() > 0:
+            raise DeptAlreadyExistError(name) 
+        dept.name = name
+
     if desc: dept.desc = desc
     if parent_dept_id:
         if db.query(Dept).filter(Dept.id==parent_dept_id, Dept.deleted==0).count() == 0:
             raise ParentDeptNotFoundError(parent_dept_id)
 
     db.add(dept)
-    db.flush()
+    db.commit()
      
 
 @pre_check
@@ -97,4 +96,4 @@ def delete_dept(req, db, context, dept_id):
 
     dept.deleted = 1
     db.add(dept)
-    db.flush()
+    db.commit()

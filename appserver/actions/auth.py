@@ -37,7 +37,7 @@ def generate_token(db, username):
     token.expires = datetime.datetime.now() + datetime.timedelta(seconds=conf.token_expires)
     token.user_id = user.id
     db.add(token)
-    db.flush()
+    db.commit()
     return token
 
 
