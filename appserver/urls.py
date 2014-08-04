@@ -20,3 +20,7 @@ def define_route(app):
     def list_dept(db):
         return dept.list_dept(request, db)
 
+    @app.get('/dept/:dept_id')
+    def show_dept(db):
+        return dept.show_dept_detail(request, db, dept_id)
+

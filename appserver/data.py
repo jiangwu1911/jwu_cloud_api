@@ -82,6 +82,5 @@ def insert_test_data(engine):
     session.add(Permission(path='^/dept$', role_id=admin_role.id, method='PUT'))
     session.add(Permission(path='^/dept$', role_id=admin_role.id, method='POST'))
     session.add(Permission(path='^/dept$', role_id=admin_role.id, method='DELETE'))
-    session.add(Permission(path='^/dept$', role_id=user_role.id, method='GET'))
 
     session.commit()

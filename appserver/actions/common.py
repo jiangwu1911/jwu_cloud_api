@@ -6,13 +6,14 @@ import utils
 import datetime
 import global_variables as gl
 
+from error import TokenNotFoundError
+from error import TokenExpiredError
+
 log = logging.getLogger("cloudapi")
 
 def pre_check(func):
     def _deco(req, db):
-
-        if verify_token(req, db) == False:
-            return {'error': 'Invalid token.'}
+        verify_token(req, db);
 
         if check_permission(req, db) == False:
             return {'error': "You don't have permission"}
@@ -27,10 +28,14 @@ def verify_token(req, db):
 
     token = req.get_header('X-Auth-Token')
     result = db.query(Token).filter(Token.id==token).first() 
-    if result:
-        if result.expires > datetime.datetime.now():
-            return True 
-    return False
+
+    if result == None:
+        raise TokenNotFoundError(token)
+
+    if result.expires < datetime.datetime.now():
+        raise TokenExpiredError(token)
+
+    return True 
 
 
 def remove_expired_token(db):

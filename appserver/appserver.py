@@ -4,6 +4,7 @@ import logging
 import logging.config
 import sys
 
+import bottle
 from bottle import Bottle, run
 from bottle.ext.sqlalchemy import SQLAlchemyPlugin
 from sqlalchemy import create_engine
@@ -19,6 +20,9 @@ VERSION ="0.1"
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
+
+bottle.ERROR_PAGE_TEMPLATE = """{"error": {"message": "{{e.body}}", "code": "{{e._status_code}}"}}"""
 
 
 def init_log():
