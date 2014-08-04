@@ -18,5 +18,5 @@ class BaseTestCase(unittest.TestCase):
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded'})
-        result = json.loads(content)
-        return result['success']['token']
+        
+        return content 

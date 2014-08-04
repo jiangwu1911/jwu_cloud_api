@@ -20,11 +20,12 @@ class DeptTestCase(BaseTestCase):
                                            'X-Auth-Token': "1234567890"}
                                  )
         error = json.loads(content)['error']
-        self.assertEqual(error['code'], "404", 'test error token failed')
+        self.assertEqual(error['code'], "401", 'test error token failed')
 
 
     def test_list_dept(self):
-        token = self.get_token('熊大', 'abc123')
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
         h = httplib2.Http() 
         resp, content = h.request(self.base_url + "dept",
                                   "GET",
@@ -36,7 +37,8 @@ class DeptTestCase(BaseTestCase):
 
 
     def test_list_dept_no_permission(self):
-        token = self.get_token('用户1', 'abc123')
+        content = self.get_token('用户1', 'abc123')
+        token = json.loads(content)['success']['token']
         h = httplib2.Http()
 
         resp, content = h.request(self.base_url + "dept",
@@ -45,7 +47,7 @@ class DeptTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )
         error = json.loads(content)['error']
-        self.assertEqual(error, "You don't have permission", "list_dept_no_permission failed")
+        self.assertEqual(error['code'], "403", 'list_dept_no_permission token failed')
 
 
 if __name__ == "__main__":

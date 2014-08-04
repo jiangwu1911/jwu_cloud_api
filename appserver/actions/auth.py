@@ -5,6 +5,8 @@ import datetime
 import utils
 
 import settings as conf
+from error import UserNotFoundError
+from error import WrongPasswordError
 
 log = logging.getLogger("cloudapi")
 
@@ -15,22 +17,16 @@ def login(req, db):
     if check_login(db, username, password):
         token = generate_token(db, username)
         return {'success': {'token': token.id}}
-    else:
-        return {'error': 'Login failed.'}
-
+    
 
 def check_login(db, username='', password=''):
     user = db.query(User).filter(User.name==username).first()
     if user == None:
-        log.debug('Cannot find user %s.' % username)
-        return False
+        raise UserNotFoundError(username)
 
     if user.password != password:
-        log.debug('Wrong password. Username:%s, Password:%s'
-                  % (username, password))
-        return False
+        raise WrongPasswordError()
     
-    log.debug(user)
     return True
 
 
