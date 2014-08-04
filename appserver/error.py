@@ -58,10 +58,10 @@ class ParentDeptNotFoundError(HTTPError):
         super(ParentDeptNotFoundError, self).__init__(404, msg)
 
 
-class CannotModifyDeptError(HTTPError):
+class NotDeptAdminError(HTTPError):
     def __init__(self, dept_id):
-        msg = "You don't have permission to modify %s" % dept_id
-        super(CannotModifyDeptError, self).__init__(403, msg)
+        msg = "You don't have permission to operate dept %s" % dept_id
+        super(NotDeptAdminError, self).__init__(403, msg)
 
 
 class DeptNotEmpty(HTTPError):

@@ -5,17 +5,16 @@ import logging
 from common import pre_check
 from common import get_input
 from common import get_required_input
-from common import can_modify_dept
+from common import is_dept_admin
 from utils import sql_result_to_json
 from utils import one_line_sql_result_to_json
 from error import DeptNotFoundError
 from error import DeptAlreadyExistError
 from error import ParentDeptNotFoundError
-from error import CannotModifyDeptError
+from error import NotDeptAdminError
 from error import DeptNotEmpty
 from model import Dept
 from model import User
-
 
 log = logging.getLogger("cloudapi")
 
@@ -69,8 +68,8 @@ def update_dept(req, db, context, dept_id):
         raise DeptNotFoundError(dept_id)
     dept = result.first()
 
-    if can_modify_dept(context, dept_id) == False:
-        raise CannotModifyDeptError(dept_id)
+    if is_dept_admin(context, dept_id) == False:
+        raise NotDeptAdminError(dept_id)
 
     if name: dept.name = name
     if desc: dept.desc = desc
@@ -90,8 +89,8 @@ def delete_dept(req, db, context, dept_id):
         raise DeptNotFoundError(dept_id)        
     dept = result.first()
 
-    if can_modify_dept(context, dept_id) == False:
-        raise CannotModifyDeptError(dept_id)
+    if is_dept_admin(context, dept_id) == False:
+        raise NotDeptAdminError(dept_id)
 
     if db.query(User).filter(User.dept_id==dept_id).count() > 0:
         raise DeptNotEmpty(dept_id)

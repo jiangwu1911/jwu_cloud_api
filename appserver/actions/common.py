@@ -117,7 +117,7 @@ def _get_sub_depts(db, dept_id):
     return depts
 
 
-def can_modify_dept(context, dept_id):
+def is_dept_admin(context, dept_id):
     for d in context['depts']:
         if d.id == dept_id:
             return True

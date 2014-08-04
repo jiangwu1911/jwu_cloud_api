@@ -43,3 +43,9 @@ def define_route(app):
     def delete_dept(db, dept_id):
         response.content_type = "application/json"
         return dept.delete_dept(request, db, dept_id)
+
+    #----- user related -----
+    @app.get('/user')
+    def list_user(db):
+        response.content_type = "application/json"
+        return user.list_user(request, db)

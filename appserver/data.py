@@ -65,6 +65,8 @@ def insert_test_data(engine):
     user6 = User(name='赵六', password=utils.md5encode('abc123'), dept_id=dept2_2.id)
     user7 = User(name='用户1', password=utils.md5encode('abc123'), dept_id=dept1_1.id)
     user8 = User(name='用户2', password=utils.md5encode('abc123'), dept_id=dept1_2.id)
+    user9 = User(name='用户3', password=utils.md5encode('abc123'), dept_id=dept1_1.id)
+    user10 = User(name='用户4', password=utils.md5encode('abc123'), dept_id=dept1_2.id)
     session.add(user1)
     session.add(user2)
     session.add(user3)
@@ -73,6 +75,8 @@ def insert_test_data(engine):
     session.add(user6)
     session.add(user7)
     session.add(user8)
+    session.add(user9)
+    session.add(user10)
     session.flush()
 
     sys_admin_role = session.query(Role).filter(Role.name=='系统管理员').first()
@@ -101,4 +105,7 @@ def insert_test_data(engine):
     session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='POST'))
     session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='DELETE'))
 
+    session.add(Permission(path='^/user$', role_id=sys_admin_role.id, method='GET'))
+
+    session.add(Permission(path='^/user$', role_id=dept_admin_role.id, method='GET'))
     session.flush()

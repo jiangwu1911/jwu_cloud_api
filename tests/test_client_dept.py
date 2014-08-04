@@ -138,7 +138,6 @@ class DeptTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-        print content
 
     
     def test_delete_dept_not_found(self):
