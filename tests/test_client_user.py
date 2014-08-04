@@ -14,7 +14,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "user",
+        resp, content = h.request(self.base_url + "users",
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -28,7 +28,7 @@ class UserTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         data = {'dept_id': 4}
-        resp, content = h.request(self.base_url + "user",
+        resp, content = h.request(self.base_url + "users",
                                   "GET",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -42,7 +42,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "user/100",
+        resp, content = h.request(self.base_url + "users/100",
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -55,7 +55,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "user/1",
+        resp, content = h.request(self.base_url + "users/1",
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -68,7 +68,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "user/4",
+        resp, content = h.request(self.base_url + "users/4",
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -82,7 +82,7 @@ class UserTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         data = {'username': '张三', 'password': md5encode('abc123'), 'dept_id': 3}
-        resp, content = h.request(self.base_url + "user",
+        resp, content = h.request(self.base_url + "users",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -98,7 +98,7 @@ class UserTestCase(BaseTestCase):
         h = httplib2.Http()
         data = {'username': '张三1', 'email': 'zhangsan@test.com', 
                 'password': md5encode('abc123'), 'dept_id': 3}
-        resp, content = h.request(self.base_url + "user",
+        resp, content = h.request(self.base_url + "users",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -114,7 +114,7 @@ class UserTestCase(BaseTestCase):
         h = httplib2.Http()
         data = {'username': '张三1', 'email': 'zhangsan1@test.com', 
                 'password': md5encode('abc123'), 'dept_id': 1}
-        resp, content = h.request(self.base_url + "user",
+        resp, content = h.request(self.base_url + "users",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -130,7 +130,7 @@ class UserTestCase(BaseTestCase):
         h = httplib2.Http()
         data = {'username': '张三1', 'email': 'zhangsan1@test.com', 
                 'password': md5encode('abc123'), 'dept_id': 3, 'role_id': 1}
-        resp, content = h.request(self.base_url + "user",
+        resp, content = h.request(self.base_url + "users",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -146,7 +146,7 @@ class UserTestCase(BaseTestCase):
         h = httplib2.Http()
         data = {'username': '张三1', 'email': 'zhangsan1@test.com', 
                 'password': md5encode('abc123'), 'dept_id': 3}
-        resp, content = h.request(self.base_url + "user",
+        resp, content = h.request(self.base_url + "users",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -155,7 +155,7 @@ class UserTestCase(BaseTestCase):
         user = json.loads(content)['user']
         self.assertTrue(user['id']>0, 'test_add_user failed')
 
-        resp, content = h.request(self.base_url + "user/" + "%d" % user['id'],
+        resp, content = h.request(self.base_url + "users/" + "%d" % user['id'],
                                   "DELETE",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -166,7 +166,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "user/100",
+        resp, content = h.request(self.base_url + "users/100",
                                   "DELETE",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -179,7 +179,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "user/1",
+        resp, content = h.request(self.base_url + "users/1",
                                   "DELETE",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -193,7 +193,7 @@ class UserTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         data = {'username': '李四'}
-        resp, content = h.request(self.base_url + "user/4",
+        resp, content = h.request(self.base_url + "users/4",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -208,7 +208,7 @@ class UserTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         data = {'email': 'lisi@test.com'}
-        resp, content = h.request(self.base_url + "user/4",
+        resp, content = h.request(self.base_url + "users/4",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -223,7 +223,7 @@ class UserTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         data = {'dept_id': 1}
-        resp, content = h.request(self.base_url + "user/4",
+        resp, content = h.request(self.base_url + "users/4",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -238,7 +238,7 @@ class UserTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         data = {'role_id': 1}
-        resp, content = h.request(self.base_url + "user/4",
+        resp, content = h.request(self.base_url + "users/4",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -254,7 +254,7 @@ class UserTestCase(BaseTestCase):
         h = httplib2.Http()
         data = {'username': '李四1', 'password': md5encode('111111'), 'email': 'lisi1@test.com',
                 'dept_id': 3, 'role_id': 3}
-        resp, content = h.request(self.base_url + "user/11",
+        resp, content = h.request(self.base_url + "users/11",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',

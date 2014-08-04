@@ -17,7 +17,7 @@ class LoginTestCase(BaseTestCase):
     def test_login_wiith_wrong_username(self):
         content = self.get_token('admin1', 'admin')
         error = json.loads(content)['error']['code']
-        self.assertEqual(error, "403", "test login with wrong username failed")
+        self.assertEqual(error, "404", "test login with wrong username failed")
 
 
     def test_login_wiith_wrong_password(self):

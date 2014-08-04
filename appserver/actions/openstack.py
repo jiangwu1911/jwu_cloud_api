@@ -6,6 +6,7 @@ import novaclient.v1_1.client as nvclient
 import logging
 from common import pre_check
 from common import get_input
+from common import get_required_input
 from error import CannotConnectToOpenStackError
 import settings as conf
 
@@ -32,5 +33,29 @@ def openstack_call(func):
 @pre_check
 @openstack_call
 def list_flavor(request, db, context):
-    flavor_objs = nova_client.flavors.list()
-    return {'flavors': [f.to_dict() for f in flavor_objs if f]}
+    objs = nova_client.flavors.list()
+    return {'flavors': [o.to_dict() for o in objs if o]}
+
+
+@pre_check
+@openstack_call
+def list_image(request, db, context):
+    objs = nova_client.images.list()
+    return {'images': [o.to_dict() for o in objs if o]}
+
+
+@pre_check
+@openstack_call
+def list_server(request, db, context):
+    objs = nova_client.servers.list()
+    return {'servers': [o.to_dict() for o in objs if o]}
+
+
+@pre_check
+@openstack_call
+def start_server(request, db, context):
+    flavor = get_required_input(req, 'flavor')
+    image = get_required_input(req, 'image')
+    
+
+    

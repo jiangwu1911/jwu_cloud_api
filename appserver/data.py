@@ -31,7 +31,6 @@ def insert_basic_data(engine):
     membership1 = UserRoleMembership(user_id=admin.id, 
                                      role_id=sys_admin_role.id)
     session.add(membership1)
-
     session.commit()
 
 
@@ -97,31 +96,40 @@ def insert_test_data(engine):
     session.add(UserRoleMembership(user10.id, user_role.id))
     session.flush()
 
-    session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='GET'))
-    session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='GET'))
-    session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='POST'))
-    session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='POST'))
-    session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='DELETE'))
+    session.add(Permission(path='^/depts$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/depts/.*', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/depts$', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/depts/.*', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/depts/.*', role_id=sys_admin_role.id, method='DELETE'))
 
-    session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='GET'))
-    session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='GET'))
-    session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='POST'))
-    session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='POST'))
-    session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='DELETE'))
+    session.add(Permission(path='^/depts$', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/depts/.*', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/depts$', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/depts/.*', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/depts/.*', role_id=dept_admin_role.id, method='DELETE'))
 
-    session.add(Permission(path='^/user$', role_id=sys_admin_role.id, method='GET'))
-    session.add(Permission(path='^/user/.*', role_id=sys_admin_role.id, method='GET'))
-    session.add(Permission(path='^/user$', role_id=sys_admin_role.id, method='POST'))
-    session.add(Permission(path='^/user/.*', role_id=sys_admin_role.id, method='POST'))
-    session.add(Permission(path='^/user/.*', role_id=sys_admin_role.id, method='DELETE'))
+    session.add(Permission(path='^/users$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/users/.*', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/users$', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/users/.*', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/users/.*', role_id=sys_admin_role.id, method='DELETE'))
 
-    session.add(Permission(path='^/user$', role_id=dept_admin_role.id, method='GET'))
-    session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='GET'))
-    session.add(Permission(path='^/user$', role_id=dept_admin_role.id, method='POST'))
-    session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='POST'))
-    session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='DELETE'))
+    session.add(Permission(path='^/users$', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/users/.*', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/users$', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/users/.*', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/users/.*', role_id=dept_admin_role.id, method='DELETE'))
 
-    session.add(Permission(path='^/flavor$', role_id=sys_admin_role.id, method='GET'))
-    session.add(Permission(path='^/flavor$', role_id=dept_admin_role.id, method='GET'))
-    session.add(Permission(path='^/flavor$', role_id=user_role.id, method='GET'))
+    session.add(Permission(path='^/flavors$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/flavors$', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/flavors$', role_id=user_role.id, method='GET'))
+
+    session.add(Permission(path='^/images$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/images$', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/images$', role_id=user_role.id, method='GET'))
+
+    session.add(Permission(path='^/servers$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/servers$', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/servers$', role_id=user_role.id, method='GET'))
+
     session.commit()
