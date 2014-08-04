@@ -6,6 +6,7 @@ import json
 import httplib2
 from urllib import urlencode
 from test_base import BaseTestCase
+from appserver.utils import md5encode
 
 
 class UserTestCase(BaseTestCase):
@@ -80,7 +81,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'username': '张三', 'password': 'abc123', 'dept_id': 3}
+        data = {'username': '张三', 'password': md5encode('abc123'), 'dept_id': 3}
         resp, content = h.request(self.base_url + "user",
                                   "POST",
                                   urlencode(data),
@@ -95,7 +96,8 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'username': '张三1', 'email': 'zhangsan@test.com', 'password': 'abc123', 'dept_id': 3}
+        data = {'username': '张三1', 'email': 'zhangsan@test.com', 
+                'password': md5encode('abc123'), 'dept_id': 3}
         resp, content = h.request(self.base_url + "user",
                                   "POST",
                                   urlencode(data),
@@ -110,7 +112,8 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'username': '张三1', 'email': 'zhangsan1@test.com', 'password': 'abc123', 'dept_id': 1}
+        data = {'username': '张三1', 'email': 'zhangsan1@test.com', 
+                'password': md5encode('abc123'), 'dept_id': 1}
         resp, content = h.request(self.base_url + "user",
                                   "POST",
                                   urlencode(data),
@@ -125,8 +128,8 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'username': '张三1', 'email': 'zhangsan1@test.com', 'password': 'abc123', 
-                'dept_id': 3, 'role_id': 1}
+        data = {'username': '张三1', 'email': 'zhangsan1@test.com', 
+                'password': md5encode('abc123'), 'dept_id': 3, 'role_id': 1}
         resp, content = h.request(self.base_url + "user",
                                   "POST",
                                   urlencode(data),
@@ -141,7 +144,8 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'username': '张三1', 'email': 'zhangsan1@test.com', 'password': 'abc123', 'dept_id': 3}
+        data = {'username': '张三1', 'email': 'zhangsan1@test.com', 
+                'password': md5encode('abc123'), 'dept_id': 3}
         resp, content = h.request(self.base_url + "user",
                                   "POST",
                                   urlencode(data),
@@ -248,7 +252,7 @@ class UserTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'username': '李四1', 'password': '111111', 'email': 'lisi1@test.com',
+        data = {'username': '李四1', 'password': md5encode('111111'), 'email': 'lisi1@test.com',
                 'dept_id': 3, 'role_id': 3}
         resp, content = h.request(self.base_url + "user/11",
                                   "POST",
