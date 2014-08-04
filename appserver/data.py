@@ -90,16 +90,15 @@ def insert_test_data(engine):
     session.flush()
 
     session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='GET'))
-    session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='PUT'))
+    session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='POST'))
     session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='DELETE'))
 
     session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='GET'))
-    session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='PUT'))
-    session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='POST'))
-    session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='DELETE'))
-
-    session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='POST'))
+    session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='DELETE'))
 
     session.flush()

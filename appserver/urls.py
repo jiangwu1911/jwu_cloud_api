@@ -34,6 +34,11 @@ def define_route(app):
         response.content_type = "application/json"
         return dept.add_dept(request, db)
 
+    @app.post('/dept/:dept_id')
+    def update_dept(db, dept_id):
+        response.content_type = "application/json"
+        return dept.update_dept(request, db, dept_id)
+
     @app.delete('/dept/:dept_id')
     def delete_dept(db, dept_id):
         response.content_type = "application/json"

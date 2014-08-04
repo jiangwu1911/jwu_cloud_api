@@ -55,7 +55,7 @@ class DeptAlreadyExistError(HTTPError):
 class ParentDeptNotFoundError(HTTPError):
     def __init__(self, dept_id):
         msg = "Parent dept %s not found" % dept_id
-        super(ParentDeptNotFoundError, self).__init__(400, msg)
+        super(ParentDeptNotFoundError, self).__init__(404, msg)
 
 
 class CannotModifyDeptError(HTTPError):

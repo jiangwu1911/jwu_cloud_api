@@ -116,24 +116,9 @@ class DeptTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )
         error = json.loads(content)['error']
-        self.assertEqual(error['code'], "400", 'test_add_dept_parent_not_exist failed')
+        self.assertEqual(error['code'], "404", 'test_add_dept_parent_not_exist failed')
 
  
-    def test_add_dept_cannot_modify_parent_dept(self):
-        content = self.get_token('熊大', 'abc123')
-        token = json.loads(content)['success']['token']
-        h = httplib2.Http()
-        data = {'name': '研发4部', 'desc': '研发4部', 'parent_dept_id': 1}
-        resp, content = h.request(self.base_url + "dept",
-                                  "POST",
-                                  urlencode(data),
-                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
-                                           'X-Auth-Token': token}
-                                 )
-        error = json.loads(content)['error']
-        self.assertEqual(error['code'], "403", 'test_add_dept_cannot_modify_parent_dept failed')
-
-
     def test_add_dept(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
@@ -193,6 +178,64 @@ class DeptTestCase(BaseTestCase):
                                  )
         error = json.loads(content)['error']
         self.assertEqual(error['code'], "403", 'test_delete_dept_no_permission failed')
+
+
+    def test_update_dept_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 2}
+        resp, content = h.request(self.base_url + "dept/100",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_update_dept_not_found failed')
+
+
+    def test_update_dept_no_permission(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 2}
+        resp, content = h.request(self.base_url + "dept/1",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "403", 'test_update_dept_no_permission failed')
+
+
+    def test_update_dept_no_parent(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 100}
+        resp, content = h.request(self.base_url + "dept/3",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_update_dept_no_parent failed')
+
+
+    def atest_update_dept_no_parent(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 2}
+        resp, content = h.request(self.base_url + "dept/3",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
 
 
 if __name__ == "__main__":

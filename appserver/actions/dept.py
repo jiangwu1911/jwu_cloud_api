@@ -3,6 +3,7 @@
 import logging
 
 from common import pre_check
+from common import get_input
 from common import get_required_input
 from common import can_modify_dept
 from utils import sql_result_to_json
@@ -50,14 +51,36 @@ def add_dept(req, db, context):
     if db.query(Dept).filter(Dept.id==parent_dept_id, Dept.deleted==0).count() == 0:
         raise ParentDeptNotFoundError(parent_dept_id)
 
-    if can_modify_dept(context, parent_dept_id) == False:
-        raise CannotModifyDeptError(parent_dept_id) 
-
     dept = Dept(name=name, desc=desc, parent_dept_id=parent_dept_id)
     db.add(dept)
     db.flush()
     return one_line_sql_result_to_json(dept, 'dept')
 
+
+@pre_check
+def update_dept(req, db, context, dept_id):
+    dept_id = int(dept_id)
+    name = get_input(req, 'name')
+    desc = get_input(req, 'desc')
+    parent_dept_id = get_input(req, 'parent_dept_id')
+    
+    result = db.query(Dept).filter(Dept.id==dept_id, Dept.deleted==0)
+    if result.count() == 0:
+        raise DeptNotFoundError(dept_id)
+    dept = result.first()
+
+    if can_modify_dept(context, dept_id) == False:
+        raise CannotModifyDeptError(dept_id)
+
+    if name: dept.name = name
+    if desc: dept.desc = desc
+    if parent_dept_id:
+        if db.query(Dept).filter(Dept.id==parent_dept_id, Dept.deleted==0).count() == 0:
+            raise ParentDeptNotFoundError(parent_dept_id)
+
+    db.add(dept)
+    db.flush()
+     
 
 @pre_check
 def delete_dept(req, db, context, dept_id):
