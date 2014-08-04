@@ -1,4 +1,4 @@
-from bottle import route, get, post, request, response
+from bottle import route, get, post, delete, request, response
 
 from actions import auth
 from actions import user
@@ -33,3 +33,8 @@ def define_route(app):
     def add_dept(db):
         response.content_type = "application/json"
         return dept.add_dept(request, db)
+
+    @app.delete('/dept/:dept_id')
+    def delete_dept(db, dept_id):
+        response.content_type = "application/json"
+        return dept.delete_dept(request, db, dept_id)

@@ -46,10 +46,10 @@ class DeptNotFoundError(HTTPError):
         super(DeptNotFoundError, self).__init__(404, msg)
 
 
-class DeptExistError(HTTPError):
+class DeptAlreadyExistError(HTTPError):
     def __init__(self, dept_id):
         msg = "Dept %s already exist" % dept_id
-        super(DeptExistError, self).__init__(400, msg)
+        super(DeptAlreadyExistError, self).__init__(400, msg)
 
 
 class ParentDeptNotFoundError(HTTPError):
@@ -62,3 +62,9 @@ class CannotModifyDeptError(HTTPError):
     def __init__(self, dept_id):
         msg = "You don't have permission to modify %s" % dept_id
         super(CannotModifyDeptError, self).__init__(403, msg)
+
+
+class DeptNotEmpty(HTTPError):
+    def __init__(self, dept_id):
+        msg = "Dept %s is not empty" % dept_id
+        super(DeptNotEmpty, self).__init__(400, msg)

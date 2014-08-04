@@ -104,11 +104,13 @@ def get_all_depts(req, db, context):
     return depts
 
 def _get_dept(db, dept_id):
-    return db.query(Dept).filter(Dept.id==dept_id).first()
+    return db.query(Dept).filter(Dept.id==dept_id, 
+                                 Dept.deleted==0).first()
 
 def _get_sub_depts(db, dept_id):
     depts = []
-    sub_depts = db.query(Dept).filter(Dept.parent_dept_id==dept_id)
+    sub_depts = db.query(Dept).filter(Dept.parent_dept_id==dept_id,
+                                      Dept.deleted==0)
 
     for d in sub_depts:
         depts.append(d)

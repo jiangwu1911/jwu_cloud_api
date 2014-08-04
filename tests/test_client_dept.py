@@ -148,6 +148,52 @@ class DeptTestCase(BaseTestCase):
         dept = json.loads(content)['dept']
         self.assertTrue(dept['id']>0, 'test_add_dept failed')
 
+        resp, content = h.request(self.base_url + "dept/" + "%d" % dept['id'],
+                                  "DELETE",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        print content
+
+    
+    def test_delete_dept_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "dept/100",
+                                  "DELETE",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_delete_dept_not_found failed')
+
+
+    def test_delete_dept_not_empty(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "dept/2",
+                                  "DELETE",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "400", 'test_delete_dept_not_empty failed')
+
+
+    def test_delete_dept_no_permission(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "dept/1",
+                                  "DELETE",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "403", 'test_delete_dept_no_permission failed')
+
 
 if __name__ == "__main__":
     unittest.main()

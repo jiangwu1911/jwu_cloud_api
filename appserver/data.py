@@ -15,7 +15,7 @@ def insert_basic_data(engine):
 
     dept = Dept(name='总部', desc='公司总部')
     session.add(dept)
-    session.commit()
+    session.flush()
 
     admin = User(name='admin', password=utils.md5encode('admin'), dept_id=dept.id)
     session.add(admin)
@@ -26,13 +26,13 @@ def insert_basic_data(engine):
     session.add(sys_admin_role)
     session.add(dept_admin_role)
     session.add(user_role)
-    session.commit()
+    session.flush()
 
     membership1 = UserRoleMembership(user_id=admin.id, 
                                      role_id=sys_admin_role.id)
     session.add(membership1)
 
-    session.commit()
+    session.flush()
 
 
 def insert_test_data(engine):
@@ -42,7 +42,7 @@ def insert_test_data(engine):
     head_dept = session.query(Dept).filter(Dept.name=='总部').first()
     dept1 = Dept(name='研发部', desc='研发部', parent_dept_id=head_dept.id)
     session.add(dept1)
-    session.commit()
+    session.flush()
     dept1_1 = Dept(name='研发一部', desc='研发一部', parent_dept_id=dept1.id)
     dept1_2 = Dept(name='研发二部', desc='研发二部', parent_dept_id=dept1.id)
     session.add(dept1_1)
@@ -50,12 +50,12 @@ def insert_test_data(engine):
 
     dept2 = Dept(name='市场部', desc='市场部', parent_dept_id=head_dept.id) 
     session.add(dept2)
-    session.commit()
+    session.flush()
     dept2_1 = Dept(name='市场一部', desc='市场一部', parent_dept_id=dept2.id) 
     dept2_2 = Dept(name='市场二部', desc='市场二部', parent_dept_id=dept2.id) 
     session.add(dept2_1)
     session.add(dept2_2)
-    session.commit()
+    session.flush()
 
     user1 = User(name='熊大', password=utils.md5encode('abc123'), dept_id=dept1.id)
     user2 = User(name='熊二', password=utils.md5encode('abc123'), dept_id=dept2.id)
@@ -73,7 +73,7 @@ def insert_test_data(engine):
     session.add(user6)
     session.add(user7)
     session.add(user8)
-    session.commit()
+    session.flush()
 
     sys_admin_role = session.query(Role).filter(Role.name=='系统管理员').first()
     dept_admin_role = session.query(Role).filter(Role.name=='部门管理员').first()
@@ -87,19 +87,19 @@ def insert_test_data(engine):
     session.add(UserRoleMembership(user6.id, dept_admin_role.id))
     session.add(UserRoleMembership(user7.id, user_role.id))
     session.add(UserRoleMembership(user8.id, user_role.id))
-    session.commit()
+    session.flush()
 
     session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='PUT'))
     session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='POST'))
-    session.add(Permission(path='^/dept$', role_id=sys_admin_role.id, method='DELETE'))
+    session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='DELETE'))
 
     session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='GET'))
     session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='PUT'))
     session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='POST'))
-    session.add(Permission(path='^/dept$', role_id=dept_admin_role.id, method='DELETE'))
+    session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='DELETE'))
 
     session.add(Permission(path='^/dept/.*', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/dept/.*', role_id=dept_admin_role.id, method='GET'))
 
-    session.commit()
+    session.flush()

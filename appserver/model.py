@@ -54,18 +54,21 @@ class Dept(Base):
     name = Column(String(50), nullable=False)
     desc = Column(String(200))
     parent_dept_id = Column(Integer)
+    deleted = Column(Integer)
     
-    def __init__(self, name='', desc='', parent_dept_id=0):
+    def __init__(self, name='', desc='', parent_dept_id=0, deleted=0):
         self.name = name
         self.desc = desc
         self.parent_dept_id = parent_dept_id
+        self.deleted = deleted
     
     def __repr__(self):
-        return("<Dept(%d, '%s', '%s', %d)>"
+        return("<Dept(%d, '%s', '%s', %d, %d)>"
                % (self.id,
                   self.name,
                   self.desc,
-                  self.parent_dept_id))
+                  self.parent_dept_id,
+                  self.deleted))
 
 
 class UserRoleMembership(Base):
