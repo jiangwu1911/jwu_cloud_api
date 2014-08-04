@@ -120,4 +120,8 @@ def insert_test_data(engine):
     session.add(Permission(path='^/user$', role_id=dept_admin_role.id, method='POST'))
     session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='POST'))
     session.add(Permission(path='^/user/.*', role_id=dept_admin_role.id, method='DELETE'))
+
+    session.add(Permission(path='^/flavor$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/flavor$', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/flavor$', role_id=user_role.id, method='GET'))
     session.commit()

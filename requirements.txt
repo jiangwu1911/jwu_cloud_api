@@ -4,3 +4,4 @@ MySQL-Python>=1.2.5
 SQLAlchemy>=0.9.7
 bottle_sqlalchemy>=0.4.1
 httplib2>=0.9
+python-novaclient>=2.18.1

@@ -3,6 +3,7 @@ from bottle import route, get, post, delete, request, response
 from actions import auth
 from actions import user
 from actions import dept
+from actions import openstack
 import model
 import json
 import utils
@@ -69,3 +70,10 @@ def define_route(app):
     def delete_user(db, user_id):
         response.content_type = "application/json"
         return user.delete_user(request, db, user_id)
+
+    #------ OpenStack flavor -----
+    @app.get('/flavor')
+    def list_flavor(db):
+        response.content_type = "application/json"
+        return openstack.list_flavor(request, db)
+ 

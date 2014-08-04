@@ -93,3 +93,10 @@ class RolePermissionDenyError(HTTPError):
     def __init__(self, role_id):
         msg = "You don't have permission to assign role %s to user" % (role_id)
         super(RolePermissionDenyError, self).__init__(403, msg)
+
+
+#----- OpenStack related -----
+class CannotConnectToOpenStackError(HTTPError):
+    def __init__(self):
+        msg = "Cannot connect to OpenStack server"
+        super(CannotConnectToOpenStackError, self).__init__(500, msg)
