@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import sys
 import unittest
 import json
@@ -9,6 +11,8 @@ from appserver.model import User
 from appserver.utils import sql_results_to_json
 from appserver.utils import md5encode
 
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 
 class UtilsTestCase(unittest.TestCase):
     def _create_session(self):
@@ -20,7 +24,7 @@ class UtilsTestCase(unittest.TestCase):
         return session
         
 
-    def atest_json_user_encode(self):
+    def test_json_user_encode(self):
         session = self._create_session()
         results = session.query(User)
         str = sql_results_to_json(results, 'users')

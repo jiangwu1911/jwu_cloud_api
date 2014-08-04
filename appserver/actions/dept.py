@@ -38,7 +38,6 @@ def get_dept(db, dept_id):
 
 def get_sub_depts(db, dept_id):
     depts = []
-
     sub_depts = db.query(Dept).filter(Dept.parent_dept_id==dept_id)
 
     for d in sub_depts:
