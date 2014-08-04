@@ -18,6 +18,7 @@ def define_route(app):
         response.content_type = "application/json"
         return user.list_user(request, db)
 
+    #----- dept related -----
     @app.get('/dept')
     def list_dept(db):
         response.content_type = "application/json"
@@ -26,4 +27,9 @@ def define_route(app):
     @app.get('/dept/:dept_id')
     def show_dept(db, dept_id):
         response.content_type = "application/json"
-        return dept.show_dept_detail(request, db, dept_id)
+        return dept.show_dept(request, db, dept_id)
+
+    @app.post('/dept')
+    def add_dept(db):
+        response.content_type = "application/json"
+        return dept.add_dept(request, db)

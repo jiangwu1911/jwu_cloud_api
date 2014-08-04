@@ -13,6 +13,7 @@ import global_variables as gl
 from error import TokenNotFoundError
 from error import TokenExpiredError
 from error import PermissionDenyError
+from error import EmptyVariableError
 
 
 log = logging.getLogger("cloudapi")
@@ -112,3 +113,22 @@ def _get_sub_depts(db, dept_id):
     for d in sub_depts:
         depts.append(d)
     return depts
+
+
+def can_modify_dept(context, dept_id):
+    for d in context['depts']:
+        if d.id == dept_id:
+            return True
+    return False
+
+
+def get_input(req, varname):
+    value = req.forms.get(varname)
+    return value 
+
+
+def get_required_input(req, varname):
+    value = req.forms.get(varname)
+    if value==None or value=='':
+        raise EmptyVariableError(varname)
+    return value

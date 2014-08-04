@@ -33,7 +33,7 @@ class DeptTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )  
         depts = json.loads(content)['depts']
-        self.assertEqual(len(depts), 3, 'list_dept failed')
+        self.assertTrue(len(depts)>2, 'list_dept failed')
 
 
     def test_list_dept_no_permission(self):
@@ -87,6 +87,66 @@ class DeptTestCase(BaseTestCase):
                                  )  
         dept = json.loads(content)['dept']
         self.assertEqual(dept['id'], 2, "test_show_dept_detail failed")
+
+
+    def test_add_duplicate_dept(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http() 
+        data = {'name': '研发部', 'desc': '研发部', 'parent_dept_id': 2}
+        resp, content = h.request(self.base_url + "dept",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "400", 'test_add_duplicate_dept failed')
+
+
+    def test_add_dept_parent_not_exist(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发3部', 'desc': '研发3部', 'parent_dept_id': 100}
+        resp, content = h.request(self.base_url + "dept",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "400", 'test_add_dept_parent_not_exist failed')
+
+ 
+    def test_add_dept_cannot_modify_parent_dept(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发4部', 'desc': '研发4部', 'parent_dept_id': 1}
+        resp, content = h.request(self.base_url + "dept",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "403", 'test_add_dept_cannot_modify_parent_dept failed')
+
+
+    def test_add_dept(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发3部', 'desc': '研发3部', 'parent_dept_id': 2}
+        resp, content = h.request(self.base_url + "dept",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        dept = json.loads(content)['dept']
+        self.assertTrue(dept['id']>0, 'test_add_dept failed')
 
 
 if __name__ == "__main__":

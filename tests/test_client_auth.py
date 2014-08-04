@@ -8,13 +8,19 @@ from test_base import BaseTestCase
 
 
 class LoginTestCase(BaseTestCase):
+    def test_login_wiith_empty_username(self):
+        content = self.get_token('', 'admin')
+        error = json.loads(content)['error']['code']
+        self.assertEqual(error, "400", "test login with empty username failed")
+
+
     def test_login_wiith_wrong_username(self):
         content = self.get_token('admin1', 'admin')
         error = json.loads(content)['error']['code']
         self.assertEqual(error, "403", "test login with wrong username failed")
 
 
-    def test_login_wiith_wrong_username(self):
+    def test_login_wiith_wrong_password(self):
         content = self.get_token('admin', 'admin1')
         error = json.loads(content)['error']['code']
         self.assertEqual(error, "403", "test login with wrong password failed")

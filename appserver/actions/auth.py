@@ -7,13 +7,15 @@ import utils
 import settings as conf
 from error import UserNotFoundError
 from error import WrongPasswordError
+from common import get_required_input
+
 
 log = logging.getLogger("cloudapi")
 
 
 def login(req, db):
-    username = req.forms.get('username')
-    password = req.forms.get('password')
+    username = get_required_input(req, 'username')
+    password = get_required_input(req, 'password')
     if check_login(db, username, password):
         token = generate_token(db, username)
         return {'success': {'token': token.id}}
@@ -23,10 +25,8 @@ def check_login(db, username='', password=''):
     user = db.query(User).filter(User.name==username).first()
     if user == None:
         raise UserNotFoundError(username)
-
     if user.password != password:
         raise WrongPasswordError()
-    
     return True
 
 
@@ -37,6 +37,7 @@ def generate_token(db, username):
     token.expires = datetime.datetime.now() + datetime.timedelta(seconds=conf.token_expires)
     token.user_id = user.id
     db.add(token)
+    db.commit()
     return token
 
 

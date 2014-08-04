@@ -1,6 +1,14 @@
 from bottle import HTTPError
 
 
+# ----- Basic -----
+class EmptyVariableError(HTTPError):
+    def __init__(self, varname):
+        msg = "%s cannot be empty" % varname
+        super(EmptyVariableError, self).__init__(400, msg)
+
+
+# ----- Auth related -----
 class UserNotFoundError(HTTPError):
     def __init__(self, username):
         msg = "User %s not found" % username
@@ -31,7 +39,26 @@ class PermissionDenyError(HTTPError):
         super(PermissionDenyError, self).__init__(403, msg)
 
 
+# ----- Dept related -----
 class DeptNotFoundError(HTTPError):
     def __init__(self, dept_id):
         msg = "Dept %s not found or do not have permission" % dept_id
         super(DeptNotFoundError, self).__init__(404, msg)
+
+
+class DeptExistError(HTTPError):
+    def __init__(self, dept_id):
+        msg = "Dept %s already exist" % dept_id
+        super(DeptExistError, self).__init__(400, msg)
+
+
+class ParentDeptNotFoundError(HTTPError):
+    def __init__(self, dept_id):
+        msg = "Parent dept %s not found" % dept_id
+        super(ParentDeptNotFoundError, self).__init__(400, msg)
+
+
+class CannotModifyDeptError(HTTPError):
+    def __init__(self, dept_id):
+        msg = "You don't have permission to modify %s" % dept_id
+        super(CannotModifyDeptError, self).__init__(403, msg)
