@@ -12,11 +12,15 @@ def md5encode(str):
     return hashlib.md5(str).hexdigest()
 
 
-def sql_results_to_json(results, name):
+def sql_result_to_json(results, name):
     items = []
     for item in results:
         items.append(item)
     return '{"' + name + '": ' + json_dumps(items) + '}'
+
+
+def one_line_sql_result_to_json(result, name):
+    return '{"' + name + '": ' + json_dumps(result) + '}'
 
 
 def json_dumps(obj):

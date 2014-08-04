@@ -29,3 +29,9 @@ class PermissionDenyError(HTTPError):
     def __init__(self):
         msg = "You don't have permission"
         super(PermissionDenyError, self).__init__(403, msg)
+
+
+class DeptNotFoundError(HTTPError):
+    def __init__(self, dept_id):
+        msg = "Dept %s not found or do not have permission" % dept_id
+        super(DeptNotFoundError, self).__init__(404, msg)

@@ -37,7 +37,7 @@ def create_db_engine():
                           conf.db_config['host'],
                           conf.db_config['db'],
                           conf.db_config['charset']),
-                          echo=True)
+                          echo=False)
 
 def install_db_plugin(app):
     engine = create_db_engine()

@@ -24,7 +24,6 @@ def define_route(app):
         return dept.list_dept(request, db)
 
     @app.get('/dept/:dept_id')
-    def show_dept(db):
+    def show_dept(db, dept_id):
         response.content_type = "application/json"
         return dept.show_dept_detail(request, db, dept_id)
-

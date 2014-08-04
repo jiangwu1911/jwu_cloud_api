@@ -18,19 +18,26 @@ from error import PermissionDenyError
 log = logging.getLogger("cloudapi")
 
 def pre_check(func):
-    def _deco(req, db):
-        #1. 检查token是否正确
-        verify_token(req, db);
+    def _deco(req, db, *args):
+        # context里保存一些比如token, permission, 允许操作的部门等信息
+        context = {}
 
-        #2. 检查所属的role, 是否有进行这种操作的权限
-        check_permission(req, db)
+        # 检查token是否正确
+        verify_token(req, db, context);
 
-        ret = func(req, db)
+        # 检查所属的role, 是否有进行这种操作的权限
+        check_permission(req, db, context)
+
+        # 获取用户所能操作的部门（包括子部门）
+        get_all_depts(req, db, context)
+
+        # 调用实际的处理函数
+        ret = func(req, db, context, *args)
         return ret
     return _deco
 
 
-def verify_token(req, db):
+def verify_token(req, db, context=None):
     remove_expired_token(db)
 
     token = req.get_header('X-Auth-Token')
@@ -42,6 +49,7 @@ def verify_token(req, db):
     if result.expires < datetime.datetime.now():
         raise TokenExpiredError(token)
 
+    context['token'] = result
     return True 
 
 
@@ -53,15 +61,18 @@ def remove_expired_token(db):
         gl.time_clean_expired_token = now
 
     
-def check_permission(req, db):
+def check_permission(req, db, context):
     user = get_user_by_token(req, db)
+    context['user'] = user
+
     membership = db.query(UserRoleMembership).filter(UserRoleMembership.user_id==user.id).first()
     if membership == None:
         return False
 
-    permissions = db.query(Permission).filter_by(role_id=membership.role_id,
-                                                 method=req.method)
+    permissions = db.query(Permission).filter_by(role_id=membership.role_id, method=req.method)
+    context['permissions'] = []
     for p in permissions:
+        context['permissions'].append(p)
         import re
         p = re.compile(p.path)
         if p.match(req.path):
@@ -83,11 +94,12 @@ def get_user_by_token(req, db):
     return result
 
 
-def get_all_depts(db, user):
+def get_all_depts(req, db, context):
     depts = []
-    depts.append(_get_dept(db, user.dept_id))
-    for d in _get_sub_depts(db, user.dept_id):
+    depts.append(_get_dept(db, context['user'].dept_id))
+    for d in _get_sub_depts(db, context['user'].dept_id):
         depts.append(d)
+    context['depts'] = depts
     return depts
 
 def _get_dept(db, dept_id):

@@ -50,5 +50,44 @@ class DeptTestCase(BaseTestCase):
         self.assertEqual(error['code'], "403", 'list_dept_no_permission token failed')
 
 
+    def test_show_dept_detail_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http() 
+        resp, content = h.request(self.base_url + "dept/0",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )  
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_show_dept_detail_not_found failed')
+
+
+    def test_show_dept_detail_no_permission(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http() 
+        resp, content = h.request(self.base_url + "dept/1",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )  
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_show_dept_detail_no_permission failed')
+
+
+    def test_show_dept_detail(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http() 
+        resp, content = h.request(self.base_url + "dept/2",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )  
+        dept = json.loads(content)['dept']
+        self.assertEqual(dept['id'], 2, "test_show_dept_detail failed")
+
+
 if __name__ == "__main__":
     unittest.main()
