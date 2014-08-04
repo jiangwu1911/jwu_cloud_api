@@ -37,5 +37,44 @@ class UserTestCase(BaseTestCase):
         self.assertTrue(len(users)>0, 'list_user_with_deptid failed')
 
 
+    def test_show_user_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "user/100",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_show_user_not_found failed')
+
+
+    def test_show_user_with_userid_not_permission(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "user/1",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_show_user_not_found failed')
+
+
+    def test_show_user_with_userid(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "user/4",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        user = json.loads(content)['user']
+        self.assertEqual(user['id'], 4, 'test_show_user_with_userid failed')
+
+
 if __name__ == "__main__":
     unittest.main()

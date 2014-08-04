@@ -39,7 +39,7 @@ class PermissionDenyError(HTTPError):
         super(PermissionDenyError, self).__init__(403, msg)
 
 
-# ----- Dept related -----
+#----- Dept related -----
 class DeptNotFoundError(HTTPError):
     def __init__(self, dept_id):
         msg = "Dept %s not found or do not have permission" % dept_id
@@ -68,3 +68,10 @@ class DeptNotEmpty(HTTPError):
     def __init__(self, dept_id):
         msg = "Dept %s is not empty" % dept_id
         super(DeptNotEmpty, self).__init__(400, msg)
+
+
+#----- User related -----
+class UserNotFoundError(HTTPError):
+    def __init__(self, user_id):
+        msg = "User %s not found or do not have permission" % user_id
+        super(UserNotFoundError, self).__init__(404, msg)

@@ -101,11 +101,16 @@ def get_all_depts(req, db, context):
     for d in _get_sub_depts(db, context['user'].dept_id):
         depts.append(d)
     context['depts'] = depts
-    return depts
+
+    context['dept_ids'] = []
+    for d in context['depts']:
+        context['dept_ids'].append(d.id)
+
 
 def _get_dept(db, dept_id):
     return db.query(Dept).filter(Dept.id==dept_id, 
                                  Dept.deleted==0).first()
+
 
 def _get_sub_depts(db, dept_id):
     depts = []

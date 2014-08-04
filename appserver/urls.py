@@ -49,3 +49,9 @@ def define_route(app):
     def list_user(db):
         response.content_type = "application/json"
         return user.list_user(request, db)
+
+    @app.get('/user/:user_id')
+    def show_user(db, user_id):
+        response.content_type = "application/json"
+        return user.show_user(request, db, user_id)
+
