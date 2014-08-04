@@ -14,5 +14,5 @@ openstack_host = "192.168.206.128"
 openstack_keystone_url = "http://%s:5000/v2.0" % openstack_host
 openstack_keystone_default_role = "_member_"
 openstack_user = "user01"
-openstack_password = "abc1231"
+openstack_password = "abc123"
 openstack_tenant_name = "project01"
