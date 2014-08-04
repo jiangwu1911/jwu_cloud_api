@@ -49,5 +49,49 @@ class LoginTestCase(BaseTestCase):
         self.assertTrue(len(servers)>=0, 'test_list_server failed')
 
 
+    def test_create_server_flavor_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'image_name': 'image1', 'flavor_name': 'flavor1', 'server_name': 'vm102'}
+        resp, content = h.request(self.base_url + "servers",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "403", 'test_create_server_flavor_not_found failed')
+
+
+    def test_create_server_image_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'image_name': 'image1', 'flavor_name': 'm1.tiny', 'server_name': 'vm102'}
+        resp, content = h.request(self.base_url + "servers",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "403", 'test_create_server_image_not_found failed')
+
+
+    def test_create_server(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'image_name': 'cirros', 'flavor_name': 'm1.tiny', 'server_name': 'vm102'}
+        resp, content = h.request(self.base_url + "servers",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        print content
+
+
 if __name__ == "__main__":
     unittest.main()
