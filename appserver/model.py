@@ -147,12 +147,13 @@ class Server(Base):
     ephemeral = Column(Integer)
     swap = Column(Integer)
     vcpus = Column(Integer)
+    ip = Column(String(100))
     deleted = Column(Integer)
     created_by = Column(Integer)   # Who created this server
     launched_at = Column(DateTime)
     
     def __init__(self, user_id=0, name='', vm_uuid='', status='', vm_state='',
-                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, deleted=0,
+                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', deleted=0,
                  created_by=0, launched_at=''):
         self.user_id = user_id 
         self.name = name
@@ -164,12 +165,13 @@ class Server(Base):
         self.ephemeral = ephemeral
         self.swap = swap
         self.vcpus = vcpus
+        self.ip = ip
         self.deleted = deleted
         self.created_by = created_by
         self.launched_at = launched_at
 
     def __repr__(self): 
-        return("<Server(%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, '%s')>"
+        return("<Server(%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', %d, %d, '%s')>"
               % (self.id,
                  self.user_id,
                  self.name,
@@ -181,6 +183,36 @@ class Server(Base):
                  self.ephemeral,
                  self.swap,
                  self.vcpus,
+                 self.ip,
                  self.deleted,
                  self.created_by,
                  self.launched_at))
+
+
+class OperationLog(Base):
+    __tablename__ = 'operation_log'
+    id = Column(Integer, Sequence('seq_pk'), primary_key=True)
+    user_id = Column(Integer)
+    resource_type = Column(String(100), nullable=False)
+    resource_id = Column(Integer)
+    resource_uuid = Column(String(100))
+    event = Column(String(2000))
+    generated = Column(DateTime)
+
+    def __init__(self, user_id=0, resource_type='', resource_id=0, resource_uuid='', 
+                 event='', generated=''):
+        self.user_id = user_id
+        self.resource_type = resource_type
+        self.resource_id = resource_id
+        self.resource_uuid = resource_uuid
+        self.event = event
+        self.generated = generated
+
+    def __repr__(self):
+        return("<OperationLog(%d, '%s', %d, '%s', '%s', %d)>"
+             % (self.user_id,
+                self.resource_type,
+                self.resource_id,
+                self.resource_uuid,
+                self.event,
+                self.generated))

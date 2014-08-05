@@ -12,11 +12,13 @@ from error import CannotConnectToOpenStackError
 from error import FlavorNotFoundError
 from error import ImageNotFoundError
 from error import ServerNotFoundError
+from error import DatabaseError
 from utils import sql_result_to_json
 from utils import one_line_sql_result_to_json
 from novaclient import exceptions
 import settings as conf
 from model import Server
+from model import OperationLog
 
 log = logging.getLogger("cloudapi")
 
@@ -110,11 +112,25 @@ def create_server(req, db, context):
                     ephemeral = flavor['OS-FLV-EXT-DATA:ephemeral'],
                     swap = 0,
                     vcpus = flavor['vcpus'],
+                    ip = '',
                     created_by = context['user'].id,
-                    launched_at = datetime.datetime.now()
-                   ) 
-    db.add(server)
-    db.commit()
+                    launched_at = datetime.datetime.now()) 
+
+    try:
+        db.add(server)
+        db.flush()
+        _write_operation_log(db,
+                             user_id = context['user'].id,
+                             resource_type = 'server', 
+                             resource_id = server.id,
+                             resource_uuid = instance['id'],
+                             event = 'create server begin')
+        db.commit()
+    except Exception, e:
+        log.error(e)
+        db.rollback()
+        raise DatabaseError(e)
+
     return one_line_sql_result_to_json(server, 'server')
 
 
@@ -133,7 +149,29 @@ def delete_server(req, db, context, server_id):
     except exceptions.NotFound, e:
         raise ServerNotFoundError(server_id)
 
-    server.status = 'DELETING'
-    server.deleted = 1
-    db.add(server)
-    db.commit() 
+    try:
+        server.status = 'DELETING'
+        server.deleted = 1
+        db.add(server)
+        _write_operation_log(db,
+                             user_id = context['user'].id,
+                             resource_type = 'server',
+                             resource_id = server_id,
+                             resource_uuid = server.vm_uuid,
+                             event = 'delete server begin')
+        db.commit() 
+    except Exception, e:
+        log.error(e)
+        db.rollback()
+        raise DatabaseError(e)
+
+
+def _write_operation_log(db, user_id='', resource_type='', resource_id=0, 
+                         resource_uuid='', event=''):
+    optlog = OperationLog(user_id = user_id,
+                          resource_type = resource_type,
+                          resource_id = resource_id,
+                          resource_uuid = resource_uuid,
+                          event = event,
+                          generated = datetime.datetime.now())
+    db.add(optlog)
