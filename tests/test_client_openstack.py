@@ -83,13 +83,14 @@ class LoginTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'image_name': 'cirros', 'flavor_name': 'm1.tiny', 'server_name': 'vm102'}
+        data = {'image_name': 'TestVM', 'flavor_name': 'very_tiny', 'server_name': 'vm102'}
         resp, content = h.request(self.base_url + "servers",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
+        print content
         server = json.loads(content)['server']
         
         resp, content = h.request(self.base_url + "servers/%d" % server['id'],

@@ -8,6 +8,7 @@ import logging
 from common import pre_check
 from common import get_input
 from common import get_required_input
+from common import handle_db_error
 from error import CannotConnectToOpenStackError
 from error import FlavorNotFoundError
 from error import ImageNotFoundError
@@ -127,9 +128,7 @@ def create_server(req, db, context):
                              event = 'create server begin')
         db.commit()
     except Exception, e:
-        log.error(e)
-        db.rollback()
-        raise DatabaseError(e)
+        handle_db_error(e)
 
     return one_line_sql_result_to_json(server, 'server')
 
@@ -161,9 +160,7 @@ def delete_server(req, db, context, server_id):
                              event = 'delete server begin')
         db.commit() 
     except Exception, e:
-        log.error(e)
-        db.rollback()
-        raise DatabaseError(e)
+        handle_db_error(e)
 
 
 def _write_operation_log(db, user_id='', resource_type='', resource_id=0, 

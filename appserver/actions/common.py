@@ -146,3 +146,10 @@ def get_required_input(req, varname):
 def get_all_roles(db):
     roles = db.query(Role)
     return roles
+
+
+def handle_db_error(db, e):
+    log.error(e)
+    db.rollback()
+    raise DatabaseError(e)
+

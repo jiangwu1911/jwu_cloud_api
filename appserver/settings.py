@@ -10,7 +10,7 @@ listen_ip = "0.0.0.0"
 listen_port = 8080
 token_expires = 86400
 
-openstack_host = "192.168.206.128"
+openstack_host = "192.168.206.100"
 openstack_keystone_url = "http://%s:5000/v2.0" % openstack_host
 openstack_keystone_default_role = "_member_"
 openstack_user = "user01"

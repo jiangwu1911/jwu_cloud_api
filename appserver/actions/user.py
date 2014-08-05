@@ -11,6 +11,7 @@ from common import get_input
 from common import get_required_input
 from common import is_dept_admin
 from common import get_all_roles
+from common import handle_db_error
 from error import NotDeptAdminError
 from error import UserNotFoundError
 from error import UsernameAlreadyExistError
@@ -86,9 +87,7 @@ def add_user(req, db, context):
         db.add(membership)
         db.commit()
     except Exception, e:
-        log.error(e)
-        db.rollback()
-        raise DatabaseError(e)
+        handle_db_error(e)
          
     return one_line_sql_result_to_json(user, 'user')
 
@@ -140,10 +139,8 @@ def update_user(req, db, context, user_id):
         db.add(membership)
         db.commit()
     except Exception, e:
-        log.error(e)
-        db.rollback()
-        raise DatabaseError(e)
- 
+        handle_db_error(e)
+
 
 @pre_check
 def delete_user(req, db, context, user_id):
