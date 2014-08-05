@@ -87,6 +87,11 @@ def define_route(app):
         response.content_type = "application/json"
         return openstack.list_server(request, db)
 
+    @app.get('/servers/:server_id')
+    def show_server(db, server_id):
+        response.content_type = "application/json"
+        return openstack.show_server(request, db, server_id)
+
     @app.post('/servers')
     def list_server(db):
         response.content_type = "application/json"

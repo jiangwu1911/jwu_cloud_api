@@ -112,3 +112,9 @@ class ImageNotFoundError(HTTPError):
     def __init__(self, image):
         msg = "Cannot find image '%s'" % image
         super(ImageNotFoundError, self).__init__(403, msg)
+
+
+class ServerNotFoundError(HTTPError):
+    def __init__(self, server):
+        msg = "Cannot find server '%s'" % server
+        super(ServerNotFoundError, self).__init__(403, msg)

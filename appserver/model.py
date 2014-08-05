@@ -5,6 +5,7 @@ import utils
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
@@ -32,6 +33,9 @@ class User(Base):
                    self.enabled,
                    self.dept_id,
                    self.deleted))
+
+    def as_dict(self):
+        return dict((c.name, getattr(self, c.name)) for c in self.__table__.columns)
 
 
 class Role(Base):
@@ -117,7 +121,7 @@ class Permission(Base):
 class Token(Base):
     __tablename__ = 'token'
     id = Column(String(100), primary_key=True)
-    expires = Column('expires', DateTime)
+    expires = Column(DateTime)
     user_id = Column(Integer)
 
     def __init__(self, expires=-1, user_id=0):
@@ -138,6 +142,7 @@ class Server(Base):
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     user_id = Column(Integer)
     name = Column(String(100), nullable=False)
+    vm_uuid = Column(String(100), nullable=False)
     status = Column(String(100), nullable=False)
     vm_state = Column(String(100), nullable=False)
     ram = Column(Integer)
@@ -146,11 +151,15 @@ class Server(Base):
     swap = Column(Integer)
     vcpus = Column(Integer)
     deleted = Column(Integer)
-
-    def __init__(self, user_id=0, name='', status='', vm_state='',
-                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, deleted=0):
+    created_by = Column(Integer)   # Who created this server
+    launched_at = Column(DateTime)
+    
+    def __init__(self, user_id=0, name='', vm_uuid='', status='', vm_state='',
+                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, deleted=0,
+                 created_by=0, launched_at=''):
         self.user_id = user_id 
         self.name = name
+        self.vm_uuid = vm_uuid
         self.status = status
         self.vm_state = vm_state
         self.ram = ram
@@ -159,11 +168,15 @@ class Server(Base):
         self.swap = swap
         self.vcpus = vcpus
         self.deleted = deleted
+        self.created_by = created_by
+        self.launched_at = launched_at
 
     def __repr__(self): 
-        return("<Server(%d, %d, '%s', '%s', '%s', %d, %d, %d, %d, %d, %d)>"
-              % (self.user_id,
+        return("<Server(%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, %d, %d, '%s')>"
+              % (self.id,
+                 self.user_id,
                  self.name,
+                 self.vm_uuid,
                  self.status,
                  self.vm_state,
                  self.ram, 
@@ -171,4 +184,6 @@ class Server(Base):
                  self.ephemeral,
                  self.swap,
                  self.vcpus,
-                 self.deleted))
+                 self.deleted,
+                 self.created_by,
+                 self.launched_at))

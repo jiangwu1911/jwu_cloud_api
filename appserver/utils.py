@@ -56,5 +56,10 @@ def new_alchemy_encoder(revisit_self = False, fields_to_expand = []):
                 # a json-encodable dict
                 return fields
 
+            import datetime
+            if isinstance(obj, datetime.datetime):
+                serial = obj.isoformat()
+                return serial
+
             return json.JSONEncoder.default(self, obj)
     return AlchemyEncoder

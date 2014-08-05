@@ -2,6 +2,7 @@
 
 import traceback
 import novaclient.v1_1.client as nvclient
+import datetime
 
 import logging
 from common import pre_check
@@ -10,6 +11,9 @@ from common import get_required_input
 from error import CannotConnectToOpenStackError
 from error import FlavorNotFoundError
 from error import ImageNotFoundError
+from error import ServerNotFoundError
+from utils import sql_result_to_json
+from utils import one_line_sql_result_to_json
 from novaclient import exceptions
 import settings as conf
 from model import Server
@@ -51,10 +55,26 @@ def list_image(req, db, context):
 @pre_check
 @openstack_call
 def list_server(req, db, context):
-    objs = nova_client.servers.list()
-    for o in objs:
-        print ', '.join(['%s:%s' % item for item in o.__dict__.items()])
-    return {'servers': [o.to_dict() for o in objs if o]}
+    servers = db.query(Server).filter(Server.user_id==context['user'].id,
+                                      Server.deleted==0).all()
+    return sql_result_to_json(servers, 'servers')
+
+
+@pre_check
+@openstack_call
+def show_server(req, db, context, server_id):
+    server = db.query(Server).filter(Server.user_id==context['user'].id,
+                                     Server.deleted==0,
+                                     Server.id==server_id).first()
+    if server == None:
+        raise ServerNotFoundError(server_id)
+
+    try:
+        instance = nova_client.servers.find(id=server.vm_uuid)
+    except exceptions.NotFound, e:
+        raise ServerNotFoundError(server_id)
+
+    return one_line_sql_result_to_json(server, 'server')
 
 
 @pre_check
@@ -81,15 +101,18 @@ def create_server(req, db, context):
     instance = nova_client.servers.get(instance).to_dict()    # get status
     flavor = flavor.to_dict()
     server = Server(user_id = context['user'].id,
-                    name=server_name,
+                    name = server_name,
+                    vm_uuid = instance['id'],
                     status = instance['status'],
                     vm_state = instance['OS-EXT-STS:vm_state'],
                     ram = flavor['ram'],
                     disk = flavor['disk'],
                     ephemeral = flavor['OS-FLV-EXT-DATA:ephemeral'],
                     swap = 0,
-                    vcpus = flavor['vcpus']
+                    vcpus = flavor['vcpus'],
+                    created_by = context['user'].id,
+                    launched_at = datetime.datetime.now()
                    ) 
     db.add(server)
     db.commit()
-    return {'server': instance}
+    return one_line_sql_result_to_json(server, 'server')
