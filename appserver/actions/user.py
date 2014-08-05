@@ -16,6 +16,7 @@ from error import UserNotFoundError
 from error import UsernameAlreadyExistError
 from error import EmailAlreadyExistError
 from error import RolePermissionDenyError
+from error import DatabaseError
 from model import User
 from model import Role
 from model import UserRoleMembership
@@ -77,12 +78,18 @@ def add_user(req, db, context):
         if role_id < operator_role_id:
             raise RolePermissionDenyError(role_id)
 
-    user = User(name=name, password=password, email=email, dept_id=dept_id)
-    db.add(user)
-    db.flush()
-    membership = UserRoleMembership(user_id=user.id, role_id=role_id)
-    db.add(membership)
-    db.commit()
+    try:
+        user = User(name=name, password=password, email=email, dept_id=dept_id)
+        db.add(user)
+        db.flush()
+        membership = UserRoleMembership(user_id=user.id, role_id=role_id)
+        db.add(membership)
+        db.commit()
+    except Exception, e:
+        log.error(e)
+        db.rollback()
+        raise DatabaseError(e)
+         
     return one_line_sql_result_to_json(user, 'user')
 
 
@@ -119,20 +126,24 @@ def update_user(req, db, context, user_id):
             raise NotDeptAdminError(dept_id)
         user.dept_id = dept_id
 
-    db.add(user)
-
     if role_id:
         role_id = int(role_id)
         operator_role_id = int(context['membership'].role_id)
         if role_id < operator_role_id:
+            # 部门管理员不能授予用户系统管理员的权限
             raise RolePermissionDenyError(role_id)
 
+    try:
+        db.add(user)
         db.query(UserRoleMembership).filter(UserRoleMembership.user_id==user_id).delete()
         membership = UserRoleMembership(user_id=user_id, role_id=role_id)
         db.add(membership)
-
-    db.commit()
-
+        db.commit()
+    except Exception, e:
+        log.error(e)
+        db.rollback()
+        raise DatabaseError(e)
+ 
 
 @pre_check
 def delete_user(req, db, context, user_id):

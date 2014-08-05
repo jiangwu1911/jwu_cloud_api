@@ -34,9 +34,6 @@ class User(Base):
                    self.dept_id,
                    self.deleted))
 
-    def as_dict(self):
-        return dict((c.name, getattr(self, c.name)) for c in self.__table__.columns)
-
 
 class Role(Base):
     __tablename__ = 'role'

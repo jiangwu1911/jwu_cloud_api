@@ -8,6 +8,12 @@ class EmptyVariableError(HTTPError):
         super(EmptyVariableError, self).__init__(400, msg)
 
 
+class DatabaseError(HTTPError):
+    def __init__(self, msg):
+        msg = "Database error: %s" % msg
+        super(DatabaseError, self).__init__(500, msg)
+
+
 # ----- Auth related -----
 class UserNotFoundError(HTTPError):
     def __init__(self, username):

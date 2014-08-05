@@ -46,7 +46,7 @@ def install_db_plugin(app):
     plugin = SQLAlchemyPlugin(engine, 
                               model.Base.metadata, 
                               create=True,
-                              commit=True,
+                              commit=False,
                               create_session=create_session)
     app.install(plugin)
 
