@@ -12,6 +12,7 @@ from error import FlavorNotFoundError
 from error import ImageNotFoundError
 from novaclient import exceptions
 import settings as conf
+from model import Server
 
 log = logging.getLogger("cloudapi")
 
@@ -51,6 +52,8 @@ def list_image(req, db, context):
 @openstack_call
 def list_server(req, db, context):
     objs = nova_client.servers.list()
+    for o in objs:
+        print ', '.join(['%s:%s' % item for item in o.__dict__.items()])
     return {'servers': [o.to_dict() for o in objs if o]}
 
 
@@ -74,4 +77,19 @@ def create_server(req, db, context):
     instance = nova_client.servers.create(name=server_name,
                                           image=image,
                                           flavor=flavor)
-    return {'server': instance.to_dict()}
+
+    instance = nova_client.servers.get(instance).to_dict()    # get status
+    flavor = flavor.to_dict()
+    server = Server(user_id = context['user'].id,
+                    name=server_name,
+                    status = instance['status'],
+                    vm_state = instance['OS-EXT-STS:vm_state'],
+                    ram = flavor['ram'],
+                    disk = flavor['disk'],
+                    ephemeral = flavor['OS-FLV-EXT-DATA:ephemeral'],
+                    swap = 0,
+                    vcpus = flavor['vcpus']
+                   ) 
+    db.add(server)
+    db.commit()
+    return {'server': instance}

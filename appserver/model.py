@@ -130,3 +130,45 @@ class Token(Base):
                % (self.id,
                   self.expires,
                   self.user_id))
+
+
+class Server(Base):
+    """VM in OpenStack"""
+    __tablename__ = 'server'
+    id = Column(Integer, Sequence('seq_pk'), primary_key=True)
+    user_id = Column(Integer)
+    name = Column(String(100), nullable=False)
+    status = Column(String(100), nullable=False)
+    vm_state = Column(String(100), nullable=False)
+    ram = Column(Integer)
+    disk = Column(Integer)
+    ephemeral = Column(Integer)
+    swap = Column(Integer)
+    vcpus = Column(Integer)
+    deleted = Column(Integer)
+
+    def __init__(self, user_id=0, name='', status='', vm_state='',
+                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, deleted=0):
+        self.user_id = user_id 
+        self.name = name
+        self.status = status
+        self.vm_state = vm_state
+        self.ram = ram
+        self.disk = disk
+        self.ephemeral = ephemeral
+        self.swap = swap
+        self.vcpus = vcpus
+        self.deleted = deleted
+
+    def __repr__(self): 
+        return("<Server(%d, %d, '%s', '%s', '%s', %d, %d, %d, %d, %d, %d)>"
+              % (self.user_id,
+                 self.name,
+                 self.status,
+                 self.vm_state,
+                 self.ram, 
+                 self.disk,
+                 self.ephemeral,
+                 self.swap,
+                 self.vcpus,
+                 self.deleted))
