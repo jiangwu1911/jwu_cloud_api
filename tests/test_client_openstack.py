@@ -90,18 +90,20 @@ class LoginTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-        print content
         server = json.loads(content)['server']
         
-        print server['id']
         resp, content = h.request(self.base_url + "servers/%d" % server['id'],
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-        print content
-        servers = json.loads(content)['server']
-        self.assertTrue(len(servers)>=0, 'test_list_server failed')
+        server = json.loads(content)['server']
+
+        resp, content = h.request(self.base_url + "servers/%d" % server['id'],
+                                  "DELETE",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
 
 
 if __name__ == "__main__":

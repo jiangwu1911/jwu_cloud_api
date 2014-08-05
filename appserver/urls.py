@@ -96,3 +96,9 @@ def define_route(app):
     def list_server(db):
         response.content_type = "application/json"
         return openstack.create_server(request, db)
+
+    @app.delete('/servers/:server_id')
+    def delete_server(db, server_id):
+        response.content_type = "application/json"
+        return openstack.delete_server(request, db, server_id)
+

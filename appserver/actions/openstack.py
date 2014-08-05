@@ -116,3 +116,24 @@ def create_server(req, db, context):
     db.add(server)
     db.commit()
     return one_line_sql_result_to_json(server, 'server')
+
+
+@pre_check
+@openstack_call
+def delete_server(req, db, context, server_id):
+    server = db.query(Server).filter(Server.user_id==context['user'].id,
+                                     Server.deleted==0,
+                                     Server.id==server_id).first()
+    if server == None:
+        raise ServerNotFoundError(server_id)
+
+    try:
+        instance = nova_client.servers.find(id=server.vm_uuid)
+        nova_client.servers.delete(instance)
+    except exceptions.NotFound, e:
+        raise ServerNotFoundError(server_id)
+
+    server.status = 'DELETING'
+    server.deleted = 1
+    db.add(server)
+    db.commit() 
