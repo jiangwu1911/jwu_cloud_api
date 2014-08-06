@@ -15,6 +15,7 @@ import settings as conf
 import model
 import urls
 import data
+from notification import NovaNotifyListener
 
 
 VERSION ="0.1"
@@ -59,6 +60,11 @@ def start_server():
     httpserver.serve(app, host=conf.listen_ip, port=conf.listen_port)
 
 
+def start_notify_listener():
+    nova_listener = NovaNotifyListener()
+    nova_listener.start()
+
+
 def init_db(testdata=False):
     answer = raw_input("Do you really want to destroy all data in database: (yes|no)? ")
     if answer == "yes":
@@ -96,7 +102,8 @@ def main():
     if options.testdata:
         init_db(True)
         sys.exit(0) 
-    
+
+    start_notify_listener()
     start_server()
 
 

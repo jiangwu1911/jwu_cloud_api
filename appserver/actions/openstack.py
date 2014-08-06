@@ -24,10 +24,10 @@ from model import OperationLog
 log = logging.getLogger("cloudapi")
 
 
-nova_client = nvclient.Client(auth_url = conf.openstack_keystone_url,
-                              username = conf.openstack_user,
-                              api_key = conf.openstack_password,
-                              project_id = conf.openstack_tenant_name
+nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
+                              username = conf.openstack_api['user'],
+                              api_key = conf.openstack_api['password'],
+                              project_id = conf.openstack_api['tenant_name']
                              )
 
 def openstack_call(func):
