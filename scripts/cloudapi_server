@@ -10,7 +10,7 @@ pidfile=./cloudapi_server.pid
 
 start() {
     echo -n "Starting $prog: "
-    daemon --user python --pidfile $pidfile "python $prog &>/dev/null & echo \$! > $pidfile"
+    daemon --pidfile $pidfile "python $prog &>/dev/null & echo \$! > $pidfile"
     retval=$?
     echo
     return $retval 
