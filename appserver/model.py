@@ -197,16 +197,16 @@ class OperationLog(Base):
     resource_id = Column(Integer)
     resource_uuid = Column(String(100))
     event = Column(String(2000))
-    generated = Column(DateTime)
+    occurred_at = Column(DateTime)
 
     def __init__(self, user_id=0, resource_type='', resource_id=0, resource_uuid='', 
-                 event='', generated=''):
+                 event='', occurred_at=''):
         self.user_id = user_id
         self.resource_type = resource_type
         self.resource_id = resource_id
         self.resource_uuid = resource_uuid
         self.event = event
-        self.generated = generated
+        self.occurred_at = occurred_at
 
     def __repr__(self):
         return("<OperationLog(%d, '%s', %d, '%s', '%s', %d)>"
@@ -215,4 +215,4 @@ class OperationLog(Base):
                 self.resource_id,
                 self.resource_uuid,
                 self.event,
-                self.generated))
+                self.occurred_at))

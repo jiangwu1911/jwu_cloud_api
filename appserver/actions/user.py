@@ -21,8 +21,8 @@ from error import DatabaseError
 from model import User
 from model import Role
 from model import UserRoleMembership
-from utils import sql_result_to_json
-from utils import one_line_sql_result_to_json
+from utils import obj_array_to_json
+from utils import obj_to_json
 
 log = logging.getLogger("cloudapi")
 
@@ -41,7 +41,7 @@ def list_user(req, db, context):
         depts = context['dept_ids']
 
     users = db.query(User).filter(User.dept_id.in_(depts))
-    return sql_result_to_json(users, 'users')
+    return obj_array_to_json(users, 'users')
 
 
 @pre_check
@@ -50,7 +50,7 @@ def show_user(req, db, context, user_id):
                                  User.id==user_id).first()
     if user == None: 
         raise UserNotFoundError(user_id)
-    return one_line_sql_result_to_json(user, 'user')
+    return obj_to_json(user, 'user')
 
 
 @pre_check
@@ -87,9 +87,9 @@ def add_user(req, db, context):
         db.add(membership)
         db.commit()
     except Exception, e:
-        handle_db_error(e)
+        handle_db_error(db, e)
          
-    return one_line_sql_result_to_json(user, 'user')
+    return obj_to_json(user, 'user')
 
 
 @pre_check
@@ -139,7 +139,7 @@ def update_user(req, db, context, user_id):
         db.add(membership)
         db.commit()
     except Exception, e:
-        handle_db_error(e)
+        handle_db_error(db, e)
 
 
 @pre_check

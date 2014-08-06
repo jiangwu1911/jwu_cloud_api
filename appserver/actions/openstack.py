@@ -14,8 +14,8 @@ from error import FlavorNotFoundError
 from error import ImageNotFoundError
 from error import ServerNotFoundError
 from error import DatabaseError
-from utils import sql_result_to_json
-from utils import one_line_sql_result_to_json
+from utils import obj_array_to_json
+from utils import obj_to_json
 from novaclient import exceptions
 import settings as conf
 from model import Server
@@ -60,7 +60,7 @@ def list_image(req, db, context):
 def list_server(req, db, context):
     servers = db.query(Server).filter(Server.user_id==context['user'].id,
                                       Server.deleted==0).all()
-    return sql_result_to_json(servers, 'servers')
+    return obj_array_to_json(servers, 'servers')
 
 
 @pre_check
@@ -77,7 +77,7 @@ def show_server(req, db, context, server_id):
     except exceptions.NotFound, e:
         raise ServerNotFoundError(server_id)
 
-    return one_line_sql_result_to_json(server, 'server')
+    return obj_to_json(server, 'server')
 
 
 @pre_check
@@ -100,8 +100,8 @@ def create_server(req, db, context):
     instance = nova_client.servers.create(name=server_name,
                                           image=image,
                                           flavor=flavor)
-
     instance = nova_client.servers.get(instance).to_dict()    # get status
+
     flavor = flavor.to_dict()
     server = Server(user_id = context['user'].id,
                     name = server_name,
@@ -128,9 +128,9 @@ def create_server(req, db, context):
                              event = 'create server begin')
         db.commit()
     except Exception, e:
-        handle_db_error(e)
+        handle_db_error(db, e)
 
-    return one_line_sql_result_to_json(server, 'server')
+    return obj_to_json(server, 'server')
 
 
 @pre_check
@@ -160,7 +160,7 @@ def delete_server(req, db, context, server_id):
                              event = 'delete server begin')
         db.commit() 
     except Exception, e:
-        handle_db_error(e)
+        handle_db_error(db, e)
 
 
 def _write_operation_log(db, user_id='', resource_type='', resource_id=0, 
@@ -170,5 +170,5 @@ def _write_operation_log(db, user_id='', resource_type='', resource_id=0,
                           resource_id = resource_id,
                           resource_uuid = resource_uuid,
                           event = event,
-                          generated = datetime.datetime.now())
+                          occurred_at = datetime.datetime.now())
     db.add(optlog)

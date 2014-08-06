@@ -90,7 +90,6 @@ class LoginTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-        print content
         server = json.loads(content)['server']
         
         resp, content = h.request(self.base_url + "servers/%d" % server['id'],

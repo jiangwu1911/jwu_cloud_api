@@ -6,8 +6,8 @@ from common import pre_check
 from common import get_input
 from common import get_required_input
 from common import is_dept_admin
-from utils import sql_result_to_json
-from utils import one_line_sql_result_to_json
+from utils import obj_array_to_json
+from utils import obj_to_json
 from error import DeptNotFoundError
 from error import DeptAlreadyExistError
 from error import ParentDeptNotFoundError
@@ -21,7 +21,7 @@ log = logging.getLogger("cloudapi")
 
 @pre_check
 def list_dept(req, db, context):
-    return sql_result_to_json(context['depts'], 'depts')
+    return obj_array_to_json(context['depts'], 'depts')
 
 
 @pre_check
@@ -29,7 +29,7 @@ def show_dept(req, db, context, dept_id):
     dept_id = int(dept_id)
     for d in context['depts']:
         if dept_id == d.id:
-            return one_line_sql_result_to_json(d, 'dept')
+            return obj_to_json(d, 'dept')
     raise DeptNotFoundError(dept_id)
 
 
@@ -48,7 +48,7 @@ def add_dept(req, db, context):
     dept = Dept(name=name, desc=desc, parent_dept_id=parent_dept_id)
     db.add(dept)
     db.commit()
-    return one_line_sql_result_to_json(dept, 'dept')
+    return obj_to_json(dept, 'dept')
 
 
 @pre_check

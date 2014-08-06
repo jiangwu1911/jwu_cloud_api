@@ -15,6 +15,7 @@ from error import TokenNotFoundError
 from error import TokenExpiredError
 from error import PermissionDenyError
 from error import EmptyVariableError
+from error import DatabaseError
 
 
 log = logging.getLogger("cloudapi")
