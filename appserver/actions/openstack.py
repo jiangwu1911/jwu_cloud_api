@@ -9,6 +9,7 @@ from common import pre_check
 from common import get_input
 from common import get_required_input
 from common import handle_db_error
+from common import write_operation_log
 from error import CannotConnectToOpenStackError
 from error import FlavorNotFoundError
 from error import ImageNotFoundError
@@ -19,7 +20,6 @@ from utils import obj_to_json
 from novaclient import exceptions
 import settings as conf
 from model import Server
-from model import OperationLog
 
 log = logging.getLogger("cloudapi")
 
@@ -105,14 +105,14 @@ def create_server(req, db, context):
     flavor = flavor.to_dict()
     server = Server(user_id = context['user'].id,
                     name = server_name,
-                    vm_uuid = instance['id'],
-                    status = instance['status'],
-                    vm_state = instance['OS-EXT-STS:vm_state'],
-                    ram = flavor['ram'],
-                    disk = flavor['disk'],
-                    ephemeral = flavor['OS-FLV-EXT-DATA:ephemeral'],
+                    vm_uuid = instance.get('id', None),
+                    state = instance.get('OS-EXT-STS:vm_state', None),
+                    task_state = instance.get('OS-EXT-STS:task_state', None),
+                    ram = flavor.get('ram', 0),
+                    disk = flavor.get('disk', 0),
+                    ephemeral = flavor.get('OS-FLV-EXT-DATA:ephemeral', 0),
                     swap = 0,
-                    vcpus = flavor['vcpus'],
+                    vcpus = flavor.get('vcpus', 0),
                     ip = '',
                     created_by = context['user'].id,
                     launched_at = datetime.datetime.now()) 
@@ -120,12 +120,12 @@ def create_server(req, db, context):
     try:
         db.add(server)
         db.flush()
-        _write_operation_log(db,
-                             user_id = context['user'].id,
-                             resource_type = 'server', 
-                             resource_id = server.id,
-                             resource_uuid = instance['id'],
-                             event = 'create server begin')
+        write_operation_log(db,
+                            user_id = context['user'].id,
+                            resource_type = 'server', 
+                            resource_id = server.id,
+                            resource_uuid = instance['id'],
+                            event = 'create server')
         db.commit()
     except Exception, e:
         handle_db_error(db, e)
@@ -149,26 +149,12 @@ def delete_server(req, db, context, server_id):
         raise ServerNotFoundError(server_id)
 
     try:
-        server.status = 'DELETING'
-        server.deleted = 1
-        db.add(server)
-        _write_operation_log(db,
-                             user_id = context['user'].id,
-                             resource_type = 'server',
-                             resource_id = server_id,
-                             resource_uuid = server.vm_uuid,
-                             event = 'delete server begin')
+        write_operation_log(db,
+                            user_id = context['user'].id,
+                            resource_type = 'server',
+                            resource_id = server_id,
+                            resource_uuid = server.vm_uuid,
+                            event = 'delete server')
         db.commit() 
     except Exception, e:
         handle_db_error(db, e)
-
-
-def _write_operation_log(db, user_id='', resource_type='', resource_id=0, 
-                         resource_uuid='', event=''):
-    optlog = OperationLog(user_id = user_id,
-                          resource_type = resource_type,
-                          resource_id = resource_id,
-                          resource_uuid = resource_uuid,
-                          event = event,
-                          occurred_at = datetime.datetime.now())
-    db.add(optlog)

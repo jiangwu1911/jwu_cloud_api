@@ -23,7 +23,7 @@ class NovaWorker(Worker):
                          callbacks=[self.process_task])]
 
     def process_task(self, body, message):
-        log.debug("Got nova notification: %s" % body)
+        pass
 
 
 class NotifyListener(threading.Thread):

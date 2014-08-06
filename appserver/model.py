@@ -140,8 +140,8 @@ class Server(Base):
     user_id = Column(Integer)
     name = Column(String(100), nullable=False)
     vm_uuid = Column(String(100), nullable=False)
-    status = Column(String(100), nullable=False)
-    vm_state = Column(String(100), nullable=False)
+    state = Column(String(100), nullable=False)
+    task_state = Column(String(100), nullable=False)
     ram = Column(Integer)
     disk = Column(Integer)
     ephemeral = Column(Integer)
@@ -152,14 +152,14 @@ class Server(Base):
     created_by = Column(Integer)   # Who created this server
     launched_at = Column(DateTime)
     
-    def __init__(self, user_id=0, name='', vm_uuid='', status='', vm_state='',
+    def __init__(self, user_id=0, name='', vm_uuid='', state='', task_state='',
                  ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', deleted=0,
                  created_by=0, launched_at=''):
         self.user_id = user_id 
         self.name = name
         self.vm_uuid = vm_uuid
-        self.status = status
-        self.vm_state = vm_state
+        self.state = state
+        self.task_state = task_state
         self.ram = ram
         self.disk = disk
         self.ephemeral = ephemeral
@@ -176,8 +176,8 @@ class Server(Base):
                  self.user_id,
                  self.name,
                  self.vm_uuid,
-                 self.status,
-                 self.vm_state,
+                 self.state,
+                 self.task_state,
                  self.ram, 
                  self.disk,
                  self.ephemeral,

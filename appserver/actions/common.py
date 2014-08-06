@@ -1,16 +1,16 @@
 # -*- coding: UTF-8 -*-
 
 import logging
+import datetime
 from model import Token
 from model import User
 from model import Dept
 from model import Role
 from model import UserRoleMembership
 from model import Permission
+from model import OperationLog
 import utils
-import datetime
 import global_variables as gl
-
 from error import TokenNotFoundError
 from error import TokenExpiredError
 from error import PermissionDenyError
@@ -154,3 +154,13 @@ def handle_db_error(db, e):
     db.rollback()
     raise DatabaseError(e)
 
+
+def write_operation_log(db, user_id='', resource_type='', resource_id=0,
+                        resource_uuid='', event=''):
+    optlog = OperationLog(user_id = user_id,
+                          resource_type = resource_type,
+                          resource_id = resource_id,
+                          resource_uuid = resource_uuid,
+                          event = event,
+                          occurred_at = datetime.datetime.now())
+    db.add(optlog)
