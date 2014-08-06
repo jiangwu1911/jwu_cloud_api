@@ -93,6 +93,7 @@ class LoginTestCase(BaseTestCase):
                                  )
         server = json.loads(content)['server']
         
+        # Get server status
         resp, content = h.request(self.base_url + "servers/%d" % server['id'],
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -101,12 +102,32 @@ class LoginTestCase(BaseTestCase):
         server = json.loads(content)['server']
 
         time.sleep(60)  # Wait for instance's state change to active
+        
+        # Suspend server
+        data = {'action': 'suspend'}
+        resp, content = h.request(self.base_url + "servers/%d" % server['id'],
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        
+        # resume server
+        time.sleep(10)  
+        data = {'action': 'resume'}
+        resp, content = h.request(self.base_url + "servers/%d" % server['id'],
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+
+        time.sleep(10)  # Wait for instance's state change to active
         resp, content = h.request(self.base_url + "servers/%d" % server['id'],
                                   "DELETE",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-
 
 if __name__ == "__main__":
     unittest.main()
