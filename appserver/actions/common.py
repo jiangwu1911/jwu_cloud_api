@@ -126,6 +126,9 @@ def _get_sub_depts(db, dept_id):
 
 
 def is_dept_admin(context, dept_id):
+    if context['membership'].role_id > 2:   # Not sys_admin and dept_admin
+        return False
+
     for d in context['depts']:
         if d.id == dept_id:
             return True

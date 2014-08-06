@@ -15,6 +15,7 @@ from error import FlavorNotFoundError
 from error import ImageNotFoundError
 from error import ServerNotFoundError
 from error import DatabaseError
+from error import UnsupportedOperationError
 from utils import obj_array_to_json
 from utils import obj_to_json
 from novaclient import exceptions
@@ -58,7 +59,7 @@ def list_image(req, db, context):
 @pre_check
 @openstack_call
 def list_server(req, db, context):
-    servers = db.query(Server).filter(Server.user_id==context['user'].id,
+    servers = db.query(Server).filter(Server.owner==context['user'].id,
                                       Server.deleted==0).all()
     return obj_array_to_json(servers, 'servers')
 
@@ -66,17 +67,11 @@ def list_server(req, db, context):
 @pre_check
 @openstack_call
 def show_server(req, db, context, server_id):
-    server = db.query(Server).filter(Server.user_id==context['user'].id,
+    server = db.query(Server).filter(Server.owner==context['user'].id,
                                      Server.deleted==0,
                                      Server.id==server_id).first()
     if server == None:
         raise ServerNotFoundError(server_id)
-
-    try:
-        instance = nova_client.servers.find(id=server.vm_uuid)
-    except exceptions.NotFound, e:
-        raise ServerNotFoundError(server_id)
-
     return obj_to_json(server, 'server')
 
 
@@ -103,9 +98,10 @@ def create_server(req, db, context):
     
     flavor = flavor.to_dict()
     instance = nova_client.servers.get(instance).to_dict()
-    server = Server(user_id = context['user'].id,
+    server = Server(creator = context['user'].id,
+                    owner = context['user'].id,
                     name = server_name,
-                    vm_uuid = instance.get('id', None),
+                    instance_id = instance.get('id', None),
                     state = instance.get('OS-EXT-STS:vm_state', None),
                     task_state = instance.get('OS-EXT-STS:task_state', None),
                     ram = flavor.get('ram', 0),
@@ -136,15 +132,14 @@ def create_server(req, db, context):
 @pre_check
 @openstack_call
 def delete_server(req, db, context, server_id):
-    server = db.query(Server).filter(Server.user_id==context['user'].id,
+    server = db.query(Server).filter(Server.creator==context['user'].id,
                                      Server.deleted==0,
                                      Server.id==server_id).first()
     if server == None:
         raise ServerNotFoundError(server_id)
 
     try:
-        instance = nova_client.servers.find(id=server.vm_uuid)
-        nova_client.servers.delete(instance)
+        nova_client.servers.delete(server.instance_id)
     except exceptions.NotFound, e:
         raise ServerNotFoundError(server_id)
 
@@ -153,8 +148,35 @@ def delete_server(req, db, context, server_id):
                             user_id = context['user'].id,
                             resource_type = 'server',
                             resource_id = server_id,
-                            resource_uuid = server.vm_uuid,
+                            resource_uuid = server.instance_id,
                             event = 'delete server')
         db.commit() 
     except Exception, e:
         handle_db_error(db, e)
+
+
+@pre_check
+@openstack_call
+def update_server(req, db, context, server_id):
+    server = db.query(Server).filter(Server.creator==context['user'].id,
+                                     Server.deleted==0,
+                                     Server.id==server_id).first()
+    if server == None:
+        raise ServerNotFoundError(server_id)
+
+    action = get_input('action') 
+    if action:
+        if action == "suspend":
+            suspend_server(server)
+        elif action == "resume":
+            resume_server(server)
+        else:
+            raise UnsupportedOperationError(action)
+
+
+def suspend_server(server):
+    nova_client.servers.suspend(server.instance_id) 
+
+
+def resume_server(server):
+    nova_client.servers.resume(server.instance_id)

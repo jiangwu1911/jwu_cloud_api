@@ -136,9 +136,10 @@ class Server(Base):
     """VM in OpenStack"""
     __tablename__ = 'server'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
-    user_id = Column(Integer)
+    creator = Column(Integer)   # Who created this server
+    owner = Column(Integer)     # Currently who own this server
     name = Column(String(100), nullable=False)
-    vm_uuid = Column(String(100), nullable=False)
+    instance_id = Column(String(100), nullable=False)
     state = Column(String(100))
     task_state = Column(String(100))
     ram = Column(Integer)
@@ -153,14 +154,15 @@ class Server(Base):
     updated_at = Column(DateTime)
     deleted_at = Column(DateTime)
     
-    def __init__(self, user_id=0, name='', vm_uuid='', state='', task_state='',
+    def __init__(self, creator=0, owner=0, name='', instance_id='', state='', task_state='',
                  ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', deleted=0,
                  created_by=0, created_at='0000-00-00 00:00:00', 
                  updated_at='0000-00-00 00:00:00', 
                  deleted_at='0000-00-00 00:00:00'):
-        self.user_id = user_id 
+        self.creator = creator
+        self.owner = owner
         self.name = name
-        self.vm_uuid = vm_uuid
+        self.instance_id = instance_id
         self.state = state
         self.task_state = task_state
         self.ram = ram
@@ -176,12 +178,13 @@ class Server(Base):
         self.deleted_at = deleted_at
 
     def __repr__(self): 
-        return("<Server(%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
+        return("<Server(%d, %d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
                 %d, '%s', %d, %d, '%s', '%s', '%s')>"
               % (self.id,
-                 self.user_id,
+                 self.creator,
+                 self.owner,
                  self.name,
-                 self.vm_uuid,
+                 self.instance_id,
                  self.state,
                  self.task_state,
                  self.ram, 

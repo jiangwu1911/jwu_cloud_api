@@ -48,7 +48,7 @@ class NovaWorker(Worker):
         session.add(notification)
         session.commit()
 
-        server = session.query(Server).filter(Server.vm_uuid==notification.instance_id).first()
+        server = session.query(Server).filter(Server.instance_id==notification.instance_id).first()
         if server:
             # Update server state
             server.state = notification.state
