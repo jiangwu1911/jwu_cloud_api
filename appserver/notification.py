@@ -1,9 +1,11 @@
 import logging
 import threading
+import datetime
 from kombu.mixins import ConsumerMixin
 from kombu import Connection
 from kombu import Exchange, Queue
 from model import NovaNotification
+from model import Server
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 import settings as conf
@@ -32,6 +34,7 @@ class NovaWorker(Worker):
         Session = sessionmaker(self.db_engine)
         session = Session()
     
+        # Save notification in database
         payload = body.get('payload')
         notification = NovaNotification(
                         message_id = body.get('message_id', ''),
@@ -44,6 +47,39 @@ class NovaWorker(Worker):
                         old_task_state = payload.get('old_task_state', ''))
         session.add(notification)
         session.commit()
+
+        server = session.query(Server).filter(Server.vm_uuid==notification.instance_id).first()
+        if server:
+            # Update server state
+            server.state = notification.state
+            server.task_state = notification.new_task_state
+            server.updated_at = datetime.datetime.now()
+
+            if notification.state=='deleted':
+                server.deleted = 1
+                server.deleted_at = datetime.datetime.now()
+
+            session.add(server)
+            session.commit()
+
+            if notification.state=='active':
+                # Get server's IP
+                import novaclient.v1_1.client as nvclient
+                nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
+                                              username = conf.openstack_api['user'],
+                                              api_key = conf.openstack_api['password'],
+                                              project_id = conf.openstack_api['tenant_name']
+                                             )
+                instance = nova_client.servers.get(notification.instance_id).to_dict()
+                ips = []
+                for net in instance.get('addresses').values():
+                    for n in net:
+                        if n.get('addr'):
+                            ips.append(n.get('addr'))
+                server.ip = ','.join(ips)
+                session.add(server)
+                session.commit()
+
         session.close()
 
         

@@ -3,6 +3,7 @@
 import sys
 import unittest
 import json
+import time
 import httplib2
 from urllib import urlencode
 
@@ -90,7 +91,6 @@ class LoginTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-        print content
         server = json.loads(content)['server']
         
         resp, content = h.request(self.base_url + "servers/%d" % server['id'],
@@ -100,6 +100,7 @@ class LoginTestCase(BaseTestCase):
                                  )
         server = json.loads(content)['server']
 
+        time.sleep(60)  # Wait for instance's state change to active
         resp, content = h.request(self.base_url + "servers/%d" % server['id'],
                                   "DELETE",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',

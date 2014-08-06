@@ -139,8 +139,8 @@ class Server(Base):
     user_id = Column(Integer)
     name = Column(String(100), nullable=False)
     vm_uuid = Column(String(100), nullable=False)
-    state = Column(String(100), nullable=False)
-    task_state = Column(String(100), nullable=False)
+    state = Column(String(100))
+    task_state = Column(String(100))
     ram = Column(Integer)
     disk = Column(Integer)
     ephemeral = Column(Integer)
@@ -149,11 +149,15 @@ class Server(Base):
     ip = Column(String(100))
     deleted = Column(Integer)
     created_by = Column(Integer)   # Who created this server
-    launched_at = Column(DateTime)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    deleted_at = Column(DateTime)
     
     def __init__(self, user_id=0, name='', vm_uuid='', state='', task_state='',
                  ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', deleted=0,
-                 created_by=0, launched_at=''):
+                 created_by=0, created_at='0000-00-00 00:00:00', 
+                 updated_at='0000-00-00 00:00:00', 
+                 deleted_at='0000-00-00 00:00:00'):
         self.user_id = user_id 
         self.name = name
         self.vm_uuid = vm_uuid
@@ -167,10 +171,13 @@ class Server(Base):
         self.ip = ip
         self.deleted = deleted
         self.created_by = created_by
-        self.launched_at = launched_at
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.deleted_at = deleted_at
 
     def __repr__(self): 
-        return("<Server(%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, '%s', %d, %d, '%s')>"
+        return("<Server(%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
+                %d, '%s', %d, %d, '%s', '%s', '%s')>"
               % (self.id,
                  self.user_id,
                  self.name,
@@ -185,7 +192,9 @@ class Server(Base):
                  self.ip,
                  self.deleted,
                  self.created_by,
-                 self.launched_at))
+                 self.created_at,
+                 self.updated_at,
+                 self.deleted_at))
 
 
 class OperationLog(Base):
@@ -199,7 +208,7 @@ class OperationLog(Base):
     occurred_at = Column(DateTime)
 
     def __init__(self, user_id=0, resource_type='', resource_id=0, resource_uuid='', 
-                 event='', occurred_at=''):
+                 event='', occurred_at='0000-00-00 00:00:00'):
         self.user_id = user_id
         self.resource_type = resource_type
         self.resource_id = resource_id
@@ -231,7 +240,7 @@ class NovaNotification(Base):
 
     def __init__(self, message_id='', event_type='', instance_id='', 
                  state='', old_state='', new_task_state='', old_task_state='',
-                 occurred_at=''):
+                 occurred_at='0000-00-00 00:00:00'):
         self.message_id = message_id
         self.event_type = event_type
         self.instance_id = instance_id,

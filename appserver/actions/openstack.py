@@ -100,9 +100,9 @@ def create_server(req, db, context):
     instance = nova_client.servers.create(name=server_name,
                                           image=image,
                                           flavor=flavor)
-    instance = nova_client.servers.get(instance).to_dict()    # get status
-
+    
     flavor = flavor.to_dict()
+    instance = nova_client.servers.get(instance).to_dict()
     server = Server(user_id = context['user'].id,
                     name = server_name,
                     vm_uuid = instance.get('id', None),
@@ -115,7 +115,7 @@ def create_server(req, db, context):
                     vcpus = flavor.get('vcpus', 0),
                     ip = '',
                     created_by = context['user'].id,
-                    launched_at = datetime.datetime.now()) 
+                    created_at = datetime.datetime.now())
 
     try:
         db.add(server)
