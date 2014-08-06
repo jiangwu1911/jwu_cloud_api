@@ -119,7 +119,7 @@ def create_server(req, db, context):
 
     try:
         db.add(server)
-        db.flush()
+        db.commit()
         write_operation_log(db,
                             user_id = context['user'].id,
                             resource_type = 'server', 

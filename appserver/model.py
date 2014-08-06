@@ -216,3 +216,42 @@ class OperationLog(Base):
                 self.resource_uuid,
                 self.event,
                 self.occurred_at))
+
+
+class NovaNotification(Base):
+    __tablename__ = 'nova_notification'
+    id = Column(Integer, Sequence('seq_pk'), primary_key=True)
+    message_id = Column(String(100))
+    event_type = Column(String(100))
+    instance_id = Column(String(100))
+    new_state = Column(String(100))
+    old_state = Column(String(100))
+    new_task_state = Column(String(100))
+    old_task_state = Column(String(100))
+    occurred_at = Column(DateTime)
+
+    def __init__(self, message_id='', event_type='', instance_id='', 
+                 new_state='', old_state='', new_task_state='', old_task_state='',
+                 occurred_at=''):
+        self.message_id = message_id
+        self.event_type = event_type
+        self.instance_id = instance_id,
+        self.new_state = new_state,
+        self.old_state = old_state,
+        self.new_task_state = new_task_state,
+        self.old_task_state = old_task_state,
+        self.occurred_at = occurred_at
+
+    def __repr__(self):
+        return("<NovaNotification(%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')>"
+             % (self.id,
+                self.message_id,
+                self.event_type, 
+                self.instance_id,
+                self.new_state,
+                self.old_state,
+                self.new_task_state,
+                self.old_task_state,
+                self.occurred_at))
+                
+    
