@@ -2,6 +2,8 @@
 
 import logging
 import datetime
+from bottle import response
+
 from model import Token
 from model import User
 from model import Dept
@@ -36,6 +38,8 @@ def pre_check(func):
 
         # 调用实际的处理函数
         ret = func(req, db, context, *args)
+
+        response.content_type = "application/json"
         return ret
     return _deco
 
