@@ -43,3 +43,10 @@ def generate_token(db, username):
 
 def _generate_uuid_token():
     return utils.get_uuid()
+
+
+def logout(req, db):
+    token = req.get_header('X-Auth-Token')
+    print token
+    db.query(Token).filter(Token.id==token).delete()
+    db.commit()

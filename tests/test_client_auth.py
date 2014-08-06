@@ -31,6 +31,14 @@ class LoginTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         self.assertTrue(len(token)>0, 'test login failed')
 
+        print token
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "logout",
+                                  "POST",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+
 
 if __name__ == "__main__":
     unittest.main()

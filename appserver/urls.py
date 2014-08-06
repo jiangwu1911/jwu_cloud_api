@@ -14,6 +14,11 @@ def define_route(app):
         response.content_type = "application/json"
         return auth.login(request, db)
 
+    @app.post('/logout')
+    def logout(db):
+        response.content_type = "application/json"
+        return auth.logout(request, db)
+
     @app.get('/users')
     def list_user(db):
         response.content_type = "application/json"
