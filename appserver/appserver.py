@@ -61,7 +61,8 @@ def start_server():
 
 
 def start_notify_listener():
-    nova_listener = NovaNotifyListener()
+    engine = create_db_engine()
+    nova_listener = NovaNotifyListener(engine)
     nova_listener.start()
 
 

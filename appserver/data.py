@@ -32,6 +32,7 @@ def insert_basic_data(engine):
                                      role_id=sys_admin_role.id)
     session.add(membership1)
     session.commit()
+    session.close()
 
 
 def insert_test_data(engine):
@@ -145,3 +146,4 @@ def insert_test_data(engine):
     session.add(Permission(path='^/servers/.*', role_id=user_role.id, method='DELETE'))
 
     session.commit()
+    session.close()
