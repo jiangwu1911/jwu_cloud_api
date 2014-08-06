@@ -132,7 +132,7 @@ def create_server(req, db, context):
 @pre_check
 @openstack_call
 def delete_server(req, db, context, server_id):
-    server = db.query(Server).filter(Server.creator==context['user'].id,
+    server = db.query(Server).filter(Server.owner==context['user'].id,
                                      Server.deleted==0,
                                      Server.id==server_id).first()
     if server == None:
@@ -158,13 +158,13 @@ def delete_server(req, db, context, server_id):
 @pre_check
 @openstack_call
 def update_server(req, db, context, server_id):
-    server = db.query(Server).filter(Server.creator==context['user'].id,
+    server = db.query(Server).filter(Server.owner==context['user'].id,
                                      Server.deleted==0,
                                      Server.id==server_id).first()
     if server == None:
         raise ServerNotFoundError(server_id)
 
-    action = get_input('action') 
+    action = get_input(req, 'action') 
     if action:
         if action == "suspend":
             suspend_server(server)

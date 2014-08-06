@@ -70,15 +70,18 @@ class NovaWorker(Worker):
                                               api_key = conf.openstack_api['password'],
                                               project_id = conf.openstack_api['tenant_name']
                                              )
-                instance = nova_client.servers.get(notification.instance_id).to_dict()
-                ips = []
-                for net in instance.get('addresses').values():
-                    for n in net:
-                        if n.get('addr'):
-                            ips.append(n.get('addr'))
-                server.ip = ','.join(ips)
-                session.add(server)
-                session.commit()
+                try:
+                    instance = nova_client.servers.get(notification.instance_id).to_dict()
+                    ips = []
+                    for net in instance.get('addresses').values():
+                        for n in net:
+                            if n.get('addr'):
+                                ips.append(n.get('addr'))
+                    server.ip = ','.join(ips)
+                    session.add(server)
+                    session.commit()
+                except Exception, e:
+                    log.info(e)
 
         session.close()
 

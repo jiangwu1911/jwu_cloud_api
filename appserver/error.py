@@ -129,5 +129,4 @@ class ServerNotFoundError(HTTPError):
 class UnsupportedOperationError(HTTPError):
     def __init__(self, operation):
         msg = "Operation '%s' is not supported" % operation
-        super(UnsupportedOperationError, self).__init__(403, msg)
-
+        super(UnsupportedOperationError, self).__init__(400, msg)
