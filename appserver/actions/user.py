@@ -105,12 +105,11 @@ def update_user(req, db, context, user_id):
     action = get_input(req, 'action')
     
     if action and action=='refresh_token':
-        if context['user'].id == user_id:
-            # 客户端请求更新token
-            token = req.get_header('X-Auth-Token')
-            delete_token(db, token)
-            token = generate_token(db, user_id)
-            return {'success': {'token': token.id}}
+        # 客户端请求更新token
+        token = req.get_header('X-Auth-Token')
+        delete_token(db, token)
+        token = generate_token(db, context['user'].id)
+        return {'success': {'token': token.id}}
 
     result = db.query(User).filter(User.id==user_id, User.deleted==0)
     if result.count() == 0:

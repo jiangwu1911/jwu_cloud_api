@@ -273,9 +273,6 @@ class UserTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-        print token
-        print content
-
 
 
 if __name__ == "__main__":
