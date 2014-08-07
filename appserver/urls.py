@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from bottle import route, get, post, delete, request, response
+from bottle import route, get, post, delete, request, response, hook
 
 from actions import auth
 from actions import user
@@ -9,15 +9,20 @@ from actions import openstack
 import model
 import utils
 
+
 def define_route(app):
-    @app.route('/:path', method='OPTIONS')
-    def options(path):
-        # 允许跨域访问
+    @app.hook('after_request')
+    def enable_cors():
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = \
-                        'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
- 
+                    'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+    @app.route('/:path', method=['OPTIONS'])
+    def options(path):
+        # 允许跨域访问
+        pass
+        
     @app.post('/login')
     def login(db):
         response.content_type = "application/json"
@@ -98,4 +103,3 @@ def define_route(app):
     @app.delete('/servers/:server_id')
     def delete_server(db, server_id):
         return openstack.delete_server(request, db, server_id)
-
