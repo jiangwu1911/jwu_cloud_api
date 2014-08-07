@@ -47,6 +47,5 @@ def _generate_uuid_token():
 
 def logout(req, db):
     token = req.get_header('X-Auth-Token')
-    print token
     db.query(Token).filter(Token.id==token).delete()
     db.commit()

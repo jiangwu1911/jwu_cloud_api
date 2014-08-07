@@ -17,7 +17,7 @@ class LoginTestCase(BaseTestCase):
     def test_login_wiith_wrong_username(self):
         content = self.get_token('admin1', 'admin')
         error = json.loads(content)['error']['code']
-        self.assertEqual(error, "404", "test login with wrong username failed")
+        self.assertEqual(error, "403", "test login with wrong username failed")
 
 
     def test_login_wiith_wrong_password(self):
@@ -37,6 +37,15 @@ class LoginTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
+
+
+    def test_logout_token_not_found(self):
+        h = httplib2.Http()
+        token = '123456'
+        resp, content = h.request(self.base_url + "logout",
+                                  "POST",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token})
 
 
 if __name__ == "__main__":
