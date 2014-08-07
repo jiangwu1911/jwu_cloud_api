@@ -262,5 +262,21 @@ class UserTestCase(BaseTestCase):
                                  )
 
 
+    def test_refresh_token(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'action': 'refresh_token'}
+        resp, content = h.request(self.base_url + "users/2",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        print token
+        print content
+
+
+
 if __name__ == "__main__":
     unittest.main()
