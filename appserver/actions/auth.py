@@ -49,3 +49,4 @@ def logout(req, db):
     token = req.get_header('X-Auth-Token')
     db.query(Token).filter(Token.id==token).delete()
     db.commit()
+    return {'success': 'token deleted.'}
