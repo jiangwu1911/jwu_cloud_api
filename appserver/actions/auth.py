@@ -26,7 +26,7 @@ def check_login(db, username='', password=''):
     if user == None:
         raise UserNotFoundError(username)
     if user.password != password:
-        raise WrongPasswordError()
+        raise UserNotFoundError(username)
     return True
 
 

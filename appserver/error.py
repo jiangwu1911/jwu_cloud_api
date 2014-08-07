@@ -81,7 +81,7 @@ class DeptNotEmpty(HTTPError):
 class UserNotFoundError(HTTPError):
     def __init__(self, user_id):
         msg = "用户'%s'不存在或密码错误。" % user_id
-        super(UserNotFoundError, self).__init__(404, msg)
+        super(UserNotFoundError, self).__init__(403, msg)
 
 
 class UsernameAlreadyExistError(HTTPError):
