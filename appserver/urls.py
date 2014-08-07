@@ -23,6 +23,11 @@ def define_route(app):
         # 允许跨域访问
         pass
         
+    @app.route('/:path/:id', method=['OPTIONS'])
+    def options(path, id):
+        # 允许跨域访问
+        pass
+        
     @app.post('/login')
     def login(db):
         response.content_type = "application/json"

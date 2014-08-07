@@ -103,7 +103,7 @@ def update_user(req, db, context, user_id):
     dept_id = get_input(req, 'dept_id')
     role_id = get_input(req, 'role_id')
     action = get_input(req, 'action')
-    
+
     if action and action=='refresh_token':
         # 客户端请求更新token
         token = req.get_header('X-Auth-Token')
