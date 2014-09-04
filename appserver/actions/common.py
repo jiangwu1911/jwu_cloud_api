@@ -13,6 +13,7 @@ from model import Permission
 from model import OperationLog
 import utils
 import global_variables as gl
+from error import TokenNotProvidedError
 from error import TokenNotFoundError
 from error import TokenExpiredError
 from error import PermissionDenyError
@@ -50,8 +51,11 @@ def verify_token(req, db, context=None):
     token = req.get_header('X-Auth-Token')
     result = db.query(Token).filter(Token.id==token).first() 
 
+    if not token:
+        raise TokenNotProvidedError
+
     if result == None:
-        raise TokenNotFoundError(token)
+        raise TokenNotFoundError
 
     if result.expires < datetime.datetime.now():
         raise TokenExpiredError(token)

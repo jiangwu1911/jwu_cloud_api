@@ -28,6 +28,12 @@ class TokenNotFoundError(HTTPError):
         super(TokenNotFoundError, self).__init__(401, msg)
 
 
+class TokenNotProvidedError(HTTPError):
+    def __init__(self):
+        msg = "请求中没有包含Token。"
+        super(TokenNotProvidedError, self).__init__(401, msg)
+
+
 class TokenExpiredError(HTTPError):
     def __init__(self, token_id):
         msg = "Token '%s'已过期。" % token_id

@@ -72,7 +72,7 @@ def update_dept(req, db, context, dept_id):
             raise DeptAlreadyExistError(name) 
         dept.name = name
 
-    if desc: dept.desc = desc
+    dept.desc = desc
     if parent_id:
         if db.query(Dept).filter(Dept.id==parent_id, Dept.deleted==0).count() == 0:
             raise ParentDeptNotFoundError(parent_id)
