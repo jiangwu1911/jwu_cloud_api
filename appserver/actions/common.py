@@ -105,8 +105,7 @@ def get_user_by_token(req, db):
 def get_all_depts(req, db, context):
     depts = []
     depts.append(_get_dept(db, context['user'].dept_id))
-    for d in _get_sub_depts(db, context['user'].dept_id):
-        depts.append(d)
+    depts.extend(_get_sub_depts(db, context['user'].dept_id))
     context['depts'] = depts
 
     context['dept_ids'] = []
@@ -126,6 +125,7 @@ def _get_sub_depts(db, dept_id):
 
     for d in sub_depts:
         depts.append(d)
+        depts.extend(_get_sub_depts(db, d.id))
     return depts
 
 
