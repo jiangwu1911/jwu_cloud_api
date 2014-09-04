@@ -1,11 +1,24 @@
 from sqlalchemy import Column, Integer, Sequence, String, Text, DateTime, Unicode
 from sqlalchemy.ext.declarative import declarative_base
 import utils
+import datetime
 
 Base = declarative_base()
 
+class JsonObj():
+    def to_dict(self):
+        obj_dict = self.__dict__
+        d = {}
+        for key, val in obj_dict.items():
+             if not key.startswith("_"):
+                if isinstance(val, datetime.datetime):
+                    d[key] = val.isoformat()
+                else:
+                    d[key] = val
+        return d
 
-class User(Base):
+
+class User(Base, JsonObj):
     __tablename__ = 'user'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     name = Column(String(50), nullable=False)
@@ -34,7 +47,7 @@ class User(Base):
                    self.deleted))
 
 
-class Role(Base):
+class Role(Base, JsonObj):
     __tablename__ = 'role'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     name = Column(String(50), nullable=False)
@@ -51,7 +64,7 @@ class Role(Base):
                   self.desc))
 
 
-class Dept(Base):
+class Dept(Base, JsonObj):
     __tablename__ = 'dept'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     name = Column(String(50), nullable=False)
@@ -74,7 +87,7 @@ class Dept(Base):
                   self.deleted))
 
 
-class UserRoleMembership(Base):
+class UserRoleMembership(Base, JsonObj):
     __tablename__ = 'user_role_membership'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     user_id = Column(Integer)
@@ -91,7 +104,7 @@ class UserRoleMembership(Base):
                   self.role_id))
 
 
-class Permission(Base):
+class Permission(Base, JsonObj):
     __tablename__ = 'permission'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     role_id = Column(Integer)
@@ -114,7 +127,7 @@ class Permission(Base):
                   self.is_permit))
 
 
-class Token(Base):
+class Token(Base, JsonObj):
     __tablename__ = 'token'
     id = Column(String(100), primary_key=True)
     expires = Column(DateTime)
@@ -132,7 +145,7 @@ class Token(Base):
                   self.user_id))
 
 
-class Server(Base):
+class Server(Base, JsonObj):
     """VM in OpenStack"""
     __tablename__ = 'server'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
@@ -200,7 +213,7 @@ class Server(Base):
                  self.deleted_at))
 
 
-class OperationLog(Base):
+class OperationLog(Base, JsonObj):
     __tablename__ = 'operation_log'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     user_id = Column(Integer)
@@ -229,7 +242,7 @@ class OperationLog(Base):
                 self.occurred_at))
 
 
-class NovaNotification(Base):
+class NovaNotification(Base, JsonObj):
     __tablename__ = 'nova_notification'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     message_id = Column(String(100), unique=True)

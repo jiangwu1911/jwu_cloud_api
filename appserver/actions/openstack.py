@@ -126,6 +126,7 @@ def create_server(req, db, context):
     except Exception, e:
         handle_db_error(db, e)
 
+    log.debug(server)
     return obj_to_json(server, 'server')
 
 

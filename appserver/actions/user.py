@@ -88,11 +88,11 @@ def add_user(req, db, context):
         membership = UserRoleMembership(user_id=user.id, role_id=role_id)
         db.add(membership)
         db.commit()
+        log.debug(user)
+        return obj_to_json(user, 'user')
     except Exception, e:
         handle_db_error(db, e)
          
-    return obj_to_json(user, 'user')
-
 
 @pre_check
 def update_user(req, db, context, user_id):

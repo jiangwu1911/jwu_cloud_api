@@ -48,6 +48,7 @@ def add_dept(req, db, context):
     dept = Dept(name=name, desc=desc, parent_id=parent_id)
     db.add(dept)
     db.commit()
+    log.debug(dept)
     return obj_to_json(dept, 'dept')
 
 

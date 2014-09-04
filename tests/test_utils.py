@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 
 sys.path.append("..")
 from appserver.model import User
-from appserver.utils import sql_result_to_json
+from appserver.utils import obj_array_to_json
 from appserver.utils import md5encode
 
 reload(sys)
@@ -27,7 +27,7 @@ class UtilsTestCase(unittest.TestCase):
     def test_json_user_encode(self):
         session = self._create_session()
         results = session.query(User)
-        str = sql_result_to_json(results, 'users')
+        str = obj_array_to_json(results, 'users')
         print json.loads(str) 
 
 

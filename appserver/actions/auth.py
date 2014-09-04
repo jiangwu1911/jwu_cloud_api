@@ -31,7 +31,7 @@ def login(req, db):
         if role == None:
             raise RoleNotFoundError
 
-        return {'success': {'token': token.id, 'role': utils.json_dumps(role)}}
+        return {'success': {'token': token.id, 'role': role.to_dict()}}
     
 
 def check_login(db, username='', password=''):
