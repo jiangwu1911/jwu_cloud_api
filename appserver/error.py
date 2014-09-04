@@ -40,6 +40,12 @@ class PermissionDenyError(HTTPError):
         super(PermissionDenyError, self).__init__(403, msg)
 
 
+class RoleNotFoundError(HTTPError):
+    def __init__(self):
+        msg = "权限定义不存在。"
+        super(RoleNotFoundError, self).__init__(404, msg)
+
+
 #----- Dept related -----
 class DeptNotFoundError(HTTPError):
     def __init__(self, dept_id):

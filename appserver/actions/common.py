@@ -121,7 +121,7 @@ def _get_dept(db, dept_id):
 
 def _get_sub_depts(db, dept_id):
     depts = []
-    sub_depts = db.query(Dept).filter(Dept.parent_dept_id==dept_id,
+    sub_depts = db.query(Dept).filter(Dept.parent_id==dept_id,
                                       Dept.deleted==0)
 
     for d in sub_depts:

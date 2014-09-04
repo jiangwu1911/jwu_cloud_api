@@ -93,7 +93,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http() 
-        data = {'name': '研发部', 'desc': '研发部', 'parent_dept_id': 2}
+        data = {'name': '研发部', 'desc': '研发部', 'parent_id': 2}
         resp, content = h.request(self.base_url + "depts",
                                   "POST",
                                   urlencode(data),
@@ -108,7 +108,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'name': '研发3部', 'desc': '研发3部', 'parent_dept_id': 100}
+        data = {'name': '研发3部', 'desc': '研发3部', 'parent_id': 100}
         resp, content = h.request(self.base_url + "depts",
                                   "POST",
                                   urlencode(data),
@@ -123,7 +123,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'name': '研发3部', 'desc': '研发3部', 'parent_dept_id': 2}
+        data = {'name': '研发3部', 'desc': '研发3部', 'parent_id': 2}
         resp, content = h.request(self.base_url + "depts",
                                   "POST",
                                   urlencode(data),
@@ -183,7 +183,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 2}
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_id': 2}
         resp, content = h.request(self.base_url + "depts/100",
                                   "POST",
                                   urlencode(data),
@@ -198,7 +198,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 2}
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_id': 2}
         resp, content = h.request(self.base_url + "depts/1",
                                   "POST",
                                   urlencode(data),
@@ -213,7 +213,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 100}
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_id': 100}
         resp, content = h.request(self.base_url + "depts/3",
                                   "POST",
                                   urlencode(data),
@@ -228,7 +228,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'name': '研发二部', 'desc': '研发二部', 'parent_dept_id': 2}
+        data = {'name': '研发二部', 'desc': '研发二部', 'parent_id': 2}
         resp, content = h.request(self.base_url + "depts/3",
                                   "POST",
                                   urlencode(data),
@@ -243,7 +243,7 @@ class DeptTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_dept_id': 2}
+        data = {'name': '研发二部1', 'desc': '研发二部1', 'parent_id': 2}
         resp, content = h.request(self.base_url + "depts/3",
                                   "POST",
                                   urlencode(data),

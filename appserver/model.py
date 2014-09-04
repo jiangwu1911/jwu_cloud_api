@@ -56,13 +56,13 @@ class Dept(Base):
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
     name = Column(String(50), nullable=False)
     desc = Column(String(200))
-    parent_dept_id = Column(Integer)
+    parent_id = Column(Integer)
     deleted = Column(Integer, default=0, nullable=False)
     
-    def __init__(self, name='', desc='', parent_dept_id=0, deleted=0):
+    def __init__(self, name='', desc='', parent_id=0, deleted=0):
         self.name = name
         self.desc = desc
-        self.parent_dept_id = parent_dept_id
+        self.parent_id = parent_id
         self.deleted = deleted
     
     def __repr__(self):
@@ -70,7 +70,7 @@ class Dept(Base):
                % (self.id,
                   self.name,
                   self.desc,
-                  self.parent_dept_id,
+                  self.parent_id,
                   self.deleted))
 
 

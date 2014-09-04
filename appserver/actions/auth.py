@@ -1,11 +1,14 @@
 import logging
+import datetime
+
 from model import User
 from model import Token
-import datetime
+from model import Role
+from model import UserRoleMembership
 import utils
-
 import settings as conf
 from error import UserNotFoundOrPasswordError
+from error import RoleNotFoundError
 from common import get_required_input
 
 
@@ -15,10 +18,20 @@ log = logging.getLogger("cloudapi")
 def login(req, db):
     username = get_required_input(req, 'username')
     password = get_required_input(req, 'password')
+
     if check_login(db, username, password):
         user = db.query(User).filter(User.name==username).first()
+
         token = generate_token(db, user.id)
-        return {'success': {'token': token.id}}
+
+        user_role = db.query(UserRoleMembership).filter(UserRoleMembership.user_id==user.id).first()
+        if user_role == None:
+            raise RoleNotFoundError 
+        role = db.query(Role).filter(Role.id==user_role.role_id).first()
+        if role == None:
+            raise RoleNotFoundError
+
+        return {'success': {'token': token.id, 'role': utils.json_dumps(role)}}
     
 
 def check_login(db, username='', password=''):

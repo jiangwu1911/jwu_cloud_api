@@ -37,15 +37,15 @@ def show_dept(req, db, context, dept_id):
 def add_dept(req, db, context):
     name = get_required_input(req, 'name')
     desc = get_required_input(req, 'desc')
-    parent_dept_id = int(get_required_input(req, 'parent_dept_id'))
+    parent_id = int(get_required_input(req, 'parent_id'))
     
     if db.query(Dept).filter(Dept.name==name, Dept.deleted==0).count() > 0:
         raise DeptAlreadyExistError(name)
 
-    if db.query(Dept).filter(Dept.id==parent_dept_id, Dept.deleted==0).count() == 0:
-        raise ParentDeptNotFoundError(parent_dept_id)
+    if db.query(Dept).filter(Dept.id==parent_id, Dept.deleted==0).count() == 0:
+        raise ParentDeptNotFoundError(parent_id)
 
-    dept = Dept(name=name, desc=desc, parent_dept_id=parent_dept_id)
+    dept = Dept(name=name, desc=desc, parent_id=parent_id)
     db.add(dept)
     db.commit()
     return obj_to_json(dept, 'dept')
@@ -56,7 +56,7 @@ def update_dept(req, db, context, dept_id):
     dept_id = int(dept_id)
     name = get_input(req, 'name')
     desc = get_input(req, 'desc')
-    parent_dept_id = get_input(req, 'parent_dept_id')
+    parent_id = get_input(req, 'parent_id')
     
     result = db.query(Dept).filter(Dept.id==dept_id, Dept.deleted==0)
     if result.count() == 0:
@@ -72,9 +72,9 @@ def update_dept(req, db, context, dept_id):
         dept.name = name
 
     if desc: dept.desc = desc
-    if parent_dept_id:
-        if db.query(Dept).filter(Dept.id==parent_dept_id, Dept.deleted==0).count() == 0:
-            raise ParentDeptNotFoundError(parent_dept_id)
+    if parent_id:
+        if db.query(Dept).filter(Dept.id==parent_id, Dept.deleted==0).count() == 0:
+            raise ParentDeptNotFoundError(parent_id)
 
     db.add(dept)
     db.commit()
