@@ -840,7 +840,7 @@ class Bottle(object):
 
     def default_error_handler(self, res):
         response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS, DELETE'
         response.headers['Access-Control-Allow-Headers'] = \
                     'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token, X-Auth-Token'
 

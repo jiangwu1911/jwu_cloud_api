@@ -18,13 +18,13 @@ class DatabaseError(HTTPError):
 # ----- Auth related -----
 class UserNotFoundOrPasswordError(HTTPError):
     def __init__(self, username):
-        msg = "用户'%s'不存在，或密码错误。" % username
+        msg = "用户名不存在，或密码错误。"
         super(UserNotFoundOrPasswordError, self).__init__(403, msg)
 
 
 class TokenNotFoundError(HTTPError):
     def __init__(self, token_id):
-        msg = "Token '%s'不存在。" % token_id
+        msg = "Token不存在。"
         super(TokenNotFoundError, self).__init__(401, msg)
 
 
@@ -36,7 +36,7 @@ class TokenNotProvidedError(HTTPError):
 
 class TokenExpiredError(HTTPError):
     def __init__(self, token_id):
-        msg = "Token '%s'已过期。" % token_id
+        msg = "Token已过期。"
         super(TokenExpiredError, self).__init__(401, msg)
 
 
@@ -55,62 +55,62 @@ class RoleNotFoundError(HTTPError):
 #----- Dept related -----
 class DeptNotFoundError(HTTPError):
     def __init__(self, dept_id):
-        msg = "部门'%s'不存在，或无权访问该部门。" % dept_id
+        msg = "部门不存在，或无权访问该部门。"
         super(DeptNotFoundError, self).__init__(404, msg)
 
 
 class DeptAlreadyExistError(HTTPError):
     def __init__(self, dept_name):
-        msg = "部门'%s'已存在。" % dept_name
+        msg = "部门名称已存在。"
         super(DeptAlreadyExistError, self).__init__(400, msg)
 
 
 class ParentDeptNotFoundError(HTTPError):
     def __init__(self, dept_id):
-        msg = "上级部门'%s'不存在。" % dept_id
+        msg = "上级部门不存在。"
         super(ParentDeptNotFoundError, self).__init__(404, msg)
 
 
 class NotDeptAdminError(HTTPError):
     def __init__(self, dept_id):
-        msg = "无权操作部门'%s'。" % dept_id
+        msg = "无权操作部门。"
         super(NotDeptAdminError, self).__init__(403, msg)
 
 
 class DeptNotEmptyError(HTTPError):
     def __init__(self, dept_id):
-        msg = "部门'%s'内部还有用户，无法删除。" % dept_id
+        msg = "部门内部还有用户，无法删除。"
         super(DeptNotEmptyError, self).__init__(400, msg)
 
 
 class ParentCannotBeSelfError(HTTPError):
     def __init__(self, dept_id):
-        msg = "部门'%s'的上级部门不能是自己。" % dept_id
+        msg = "部门的上级部门不能是自己。"
         super(ParentCannotBeSelfError, self).__init__(400, msg)
 
 
 #----- User related -----
 class UserNotFoundError(HTTPError):
     def __init__(self, user_id):
-        msg = "用户'%s'不存在。" % user_id
+        msg = "用户不存在。"
         super(UserNotFoundError, self).__init__(404, msg)
 
 
 class UsernameAlreadyExistError(HTTPError):
     def __init__(self, username):
-        msg = "用户名'%s'已存在。" % username
+        msg = "用户名已存在。"
         super(UsernameAlreadyExistError, self).__init__(400, msg)
 
 
 class EmailAlreadyExistError(HTTPError):
     def __init__(self, email):
-        msg = "Email '%s'已存在。" % email
+        msg = "Email已存在。"
         super(EmailAlreadyExistError, self).__init__(400, msg)
 
 
 class RolePermissionDenyError(HTTPError):
     def __init__(self, role_id):
-        msg = "无权把角色'%s'授权给用户。" % (role_id)
+        msg = "无权把角色授权给用户。"
         super(RolePermissionDenyError, self).__init__(403, msg)
 
 
