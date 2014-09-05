@@ -55,7 +55,7 @@ def verify_token(req, db, context=None):
         raise TokenNotProvidedError
 
     if result == None:
-        raise TokenNotFoundError
+        raise TokenNotFoundError(token)
 
     if result.expires < datetime.datetime.now():
         raise TokenExpiredError(token)
