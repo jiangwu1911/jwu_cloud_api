@@ -33,7 +33,7 @@ class DeptTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )  
         depts = json.loads(content)['depts']
-        self.assertTrue(len(depts)>2, 'list_dept failed')
+        self.assertTrue(len(depts)>=2, 'list_dept failed')
 
 
     def test_list_dept_no_permission(self):
@@ -250,6 +250,20 @@ class DeptTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
+
+    def test_update_dept_parent_id_error(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'name': '研发二部', 'desc': '研发二部', 'parent_id': 4}
+        resp, content = h.request(self.base_url + "depts/4",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "400", 'test_update_dept_parent_id_error failed')
 
 
 if __name__ == "__main__":

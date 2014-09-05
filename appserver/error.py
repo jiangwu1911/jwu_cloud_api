@@ -77,10 +77,16 @@ class NotDeptAdminError(HTTPError):
         super(NotDeptAdminError, self).__init__(403, msg)
 
 
-class DeptNotEmpty(HTTPError):
+class DeptNotEmptyError(HTTPError):
     def __init__(self, dept_id):
         msg = "部门'%s'内部还有用户，无法删除。" % dept_id
-        super(DeptNotEmpty, self).__init__(400, msg)
+        super(DeptNotEmptyError, self).__init__(400, msg)
+
+
+class ParentCannotBeSelfError(HTTPError):
+    def __init__(self, dept_id):
+        msg = "部门'%s'的上级部门不能是自己。" % dept_id
+        super(ParentCannotBeSelfError, self).__init__(400, msg)
 
 
 #----- User related -----

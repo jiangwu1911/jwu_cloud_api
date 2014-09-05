@@ -12,7 +12,8 @@ from error import DeptNotFoundError
 from error import DeptAlreadyExistError
 from error import ParentDeptNotFoundError
 from error import NotDeptAdminError
-from error import DeptNotEmpty
+from error import DeptNotEmptyError
+from error import ParentCannotBeSelfError
 from model import Dept
 from model import User
 
@@ -74,8 +75,11 @@ def update_dept(req, db, context, dept_id):
 
     dept.desc = desc
     if parent_id:
+        if dept_id == int(parent_id):
+            raise ParentCannotBeSelfError(dept_id)
         if db.query(Dept).filter(Dept.id==parent_id, Dept.deleted==0).count() == 0:
             raise ParentDeptNotFoundError(parent_id)
+        dept.parent_id = parent_id
 
     db.add(dept)
     db.commit()
@@ -93,7 +97,7 @@ def delete_dept(req, db, context, dept_id):
         raise NotDeptAdminError(dept_id)
 
     if db.query(User).filter(User.dept_id==dept_id).count() > 0:
-        raise DeptNotEmpty(dept_id)
+        raise DeptNotEmptyError(dept_id)
 
     dept.deleted = 1
     db.add(dept)
