@@ -128,20 +128,6 @@ def _get_sub_depts(db, dept_id):
     return depts
 
 
-def get_dept_tree(db, dept_id):
-    obj = _get_dept(db, dept_id)
-    dept = {}
-    dept['id'] = obj.id
-    dept['name'] = obj.name
-    dept['children'] = []
-
-    sub_depts = db.query(Dept).filter(Dept.parent_id==dept_id, Dept.deleted==0)
-    for d in sub_depts:
-        dept['children'].append(get_dept_tree(db, d.id))
-
-    return dept
-
-
 def is_dept_admin(context, dept_id):
     if context['membership'].role_id > 2:   # Not sys_admin and dept_admin
         return False

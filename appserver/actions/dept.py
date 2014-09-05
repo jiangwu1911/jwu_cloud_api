@@ -1,12 +1,13 @@
 # -*- coding: UTF-8 -*-
 
 import logging
+import json
+import pprint
 
 from common import pre_check
 from common import get_input
 from common import get_required_input
 from common import is_dept_admin
-from common import get_dept_tree
 from utils import obj_array_to_json
 from utils import obj_to_json
 from error import DeptNotFoundError
@@ -21,12 +22,29 @@ from model import User
 log = logging.getLogger("cloudapi")
 
 
+def get_dept_tree(db, dept_id):
+    obj = db.query(Dept).filter(Dept.id==dept_id, Dept.deleted==0).first()
+    dept = {}
+    dept['id'] = obj.id
+    dept['text'] = obj.name
+
+    sub_depts = db.query(Dept).filter(Dept.parent_id==dept_id, Dept.deleted==0)
+    if sub_depts.count() > 0:
+        dept['children'] = []
+        for d in sub_depts:
+            dept['children'].append(get_dept_tree(db, d.id))
+    else:
+        dept['leaf'] = 'true'
+
+    return dept
+
+
 @pre_check
 def list_dept(req, db, context):
-    format = get_input(req, 'format')
+    format = req.query.get('format')
     if (format and format=='as_tree'):
         dept_id = context['user'].dept_id
-        return get_dept_tree(db, dept_id)
+        return '[' + json.dumps(get_dept_tree(db, dept_id)) + ']'
     else:     
         return obj_array_to_json(context['depts'], 'depts')
 

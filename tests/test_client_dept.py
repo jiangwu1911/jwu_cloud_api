@@ -47,8 +47,8 @@ class DeptTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
-        dept = json.loads(content)
-        self.assertTrue(dept['id']>=0, 'test_list_dept_as_tree failed')
+        depts = json.loads(content)
+        self.assertTrue(len(depts)==1, 'test_list_dept_as_tree failed')
 
 
     def test_list_dept_no_permission(self):
