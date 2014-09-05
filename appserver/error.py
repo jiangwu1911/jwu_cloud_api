@@ -89,6 +89,12 @@ class ParentCannotBeSelfError(HTTPError):
         super(ParentCannotBeSelfError, self).__init__(400, msg)
 
 
+class DeptHasChildrenError(HTTPError):
+    def __init__(self, dept_id):
+        msg = "部门下面有子部门，无法删除。"
+        super(DeptHasChildrenError, self).__init__(400, msg)
+
+
 #----- User related -----
 class UserNotFoundError(HTTPError):
     def __init__(self, user_id):

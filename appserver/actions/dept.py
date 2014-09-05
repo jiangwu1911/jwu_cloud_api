@@ -16,6 +16,7 @@ from error import ParentDeptNotFoundError
 from error import NotDeptAdminError
 from error import DeptNotEmptyError
 from error import ParentCannotBeSelfError
+from error import DeptHasChildrenError
 from model import Dept
 from model import User
 
@@ -122,6 +123,9 @@ def delete_dept(req, db, context, dept_id):
 
     if db.query(User).filter(User.dept_id==dept_id).count() > 0:
         raise DeptNotEmptyError(dept_id)
+
+    if db.query(User).filter(Dept.parent_id==dept_id).count() > 0:
+        raise DeptHasChildrenError(dept_id)
 
     dept.deleted = 1
     db.add(dept)
