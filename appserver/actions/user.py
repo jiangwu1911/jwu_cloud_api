@@ -12,6 +12,7 @@ from common import get_required_input
 from common import is_dept_admin
 from common import get_all_roles
 from common import handle_db_error
+from common import get_all_depts
 from error import NotDeptAdminError
 from error import UserNotFoundError
 from error import UsernameAlreadyExistError
@@ -38,8 +39,12 @@ def list_user(req, db, context):
         dept_id = int(dept_id)
         if is_dept_admin(context, dept_id) == False:
             raise NotDeptAdminError(dept_id)
-        depts.append(dept_id)
+        # 如果给出了dept_id, 显示所有该部门和下面子部门的用户
+        for d in get_all_depts(req, db, context, dept_id):
+            depts.append(d.id)
+        
     else:
+        # 如果没给出dept_id, 显示该管理员管理的所有部门的用户
         depts = context['dept_ids']
 
     users = db.query(User).filter(User.dept_id.in_(depts))

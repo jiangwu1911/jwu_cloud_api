@@ -35,7 +35,10 @@ def pre_check(func):
         check_permission(req, db, context)
 
         # 获取用户所能操作的部门（包括子部门）
-        get_all_depts(req, db, context)
+        context['depts'] = get_all_depts(req, db, context, context['user'].dept_id)
+        context['dept_ids'] = []
+        for d in context['depts']:
+            context['dept_ids'].append(d.id)
 
         # 调用实际的处理函数
         ret = func(req, db, context, *args)
@@ -106,15 +109,12 @@ def get_user_by_token(req, db):
     return result
 
 
-def get_all_depts(req, db, context):
+def get_all_depts(req, db, context, dept_id):
     depts = []
-    depts.append(_get_dept(db, context['user'].dept_id))
-    depts.extend(_get_sub_depts(db, context['user'].dept_id))
-    context['depts'] = depts
+    depts.append(_get_dept(db, dept_id))
+    depts.extend(_get_sub_depts(db, dept_id))
+    return depts
 
-    context['dept_ids'] = []
-    for d in context['depts']:
-        context['dept_ids'].append(d.id)
 
 def _get_dept(db, dept_id):
     return db.query(Dept).filter(Dept.id==dept_id, Dept.deleted==0).first()
@@ -140,11 +140,13 @@ def is_dept_admin(context, dept_id):
 
 def get_input(req, varname):
     value = req.forms.get(varname)
+    if value == None:
+        value = req.query.get(varname)
     return value 
 
 
 def get_required_input(req, varname):
-    value = req.forms.get(varname)
+    value = get_input(req, varname)
     if value==None or value=='':
         raise EmptyVariableError(varname)
     return value

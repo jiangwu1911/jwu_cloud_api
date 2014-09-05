@@ -41,7 +41,7 @@ def get_dept_tree(db, dept_id):
 
 @pre_check
 def list_dept(req, db, context):
-    format = req.query.get('format')
+    format = get_input(req, 'format')
     if (format and format=='as_tree'):
         dept_id = context['user'].dept_id
         return '[' + json.dumps(get_dept_tree(db, dept_id)) + ']'
@@ -100,7 +100,7 @@ def update_dept(req, db, context, dept_id):
     dept.desc = desc
     if parent_id:
         if dept_id == int(parent_id):
-            raise ParentCannotBeSelfError(dept_id)
+            raise ParentCannotBeSelfError(dept.name)
         if db.query(Dept).filter(Dept.id==parent_id, Dept.deleted==0).count() == 0:
             raise ParentDeptNotFoundError(parent_id)
         dept.parent_id = parent_id
