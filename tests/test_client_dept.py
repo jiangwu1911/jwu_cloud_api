@@ -24,7 +24,7 @@ class DeptTestCase(BaseTestCase):
 
 
     def test_list_dept(self):
-        content = self.get_token('熊大', 'abc123')
+        content = self.get_token('admin', 'admin')
         token = json.loads(content)['success']['token']
         h = httplib2.Http() 
         resp, content = h.request(self.base_url + "depts",
@@ -34,6 +34,21 @@ class DeptTestCase(BaseTestCase):
                                  )  
         depts = json.loads(content)['depts']
         self.assertTrue(len(depts)>=2, 'list_dept failed')
+
+
+    def test_list_dept_as_tree(self):
+        content = self.get_token('admin', 'admin')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'format': 'as_tree'}
+        resp, content = h.request(self.base_url + "depts",
+                                  "GET",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        dept = json.loads(content)
+        self.assertTrue(dept['id']>=0, 'test_list_dept_as_tree failed')
 
 
     def test_list_dept_no_permission(self):

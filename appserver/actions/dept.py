@@ -6,6 +6,7 @@ from common import pre_check
 from common import get_input
 from common import get_required_input
 from common import is_dept_admin
+from common import get_dept_tree
 from utils import obj_array_to_json
 from utils import obj_to_json
 from error import DeptNotFoundError
@@ -22,7 +23,12 @@ log = logging.getLogger("cloudapi")
 
 @pre_check
 def list_dept(req, db, context):
-    return obj_array_to_json(context['depts'], 'depts')
+    format = get_input(req, 'format')
+    if (format and format=='as_tree'):
+        dept_id = context['user'].dept_id
+        return get_dept_tree(db, dept_id)
+    else:     
+        return obj_array_to_json(context['depts'], 'depts')
 
 
 @pre_check

@@ -116,21 +116,30 @@ def get_all_depts(req, db, context):
     for d in context['depts']:
         context['dept_ids'].append(d.id)
 
-
 def _get_dept(db, dept_id):
-    return db.query(Dept).filter(Dept.id==dept_id, 
-                                 Dept.deleted==0).first()
-
+    return db.query(Dept).filter(Dept.id==dept_id, Dept.deleted==0).first()
 
 def _get_sub_depts(db, dept_id):
     depts = []
-    sub_depts = db.query(Dept).filter(Dept.parent_id==dept_id,
-                                      Dept.deleted==0)
-
+    sub_depts = db.query(Dept).filter(Dept.parent_id==dept_id, Dept.deleted==0)
     for d in sub_depts:
         depts.append(d)
         depts.extend(_get_sub_depts(db, d.id))
     return depts
+
+
+def get_dept_tree(db, dept_id):
+    obj = _get_dept(db, dept_id)
+    dept = {}
+    dept['id'] = obj.id
+    dept['name'] = obj.name
+    dept['children'] = []
+
+    sub_depts = db.query(Dept).filter(Dept.parent_id==dept_id, Dept.deleted==0)
+    for d in sub_depts:
+        dept['children'].append(get_dept_tree(db, d.id))
+
+    return dept
 
 
 def is_dept_admin(context, dept_id):
