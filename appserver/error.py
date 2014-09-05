@@ -95,6 +95,12 @@ class DeptHasChildrenError(HTTPError):
         super(DeptHasChildrenError, self).__init__(400, msg)
 
 
+class CannotDeleteHeadDeptError(HTTPError):
+    def __init__(self, dept_id):
+        msg = "不允许删除总部。"
+        super(CannotDeleteHeadDeptError, self).__init__(400, msg)
+
+
 #----- User related -----
 class UserNotFoundError(HTTPError):
     def __init__(self, user_id):

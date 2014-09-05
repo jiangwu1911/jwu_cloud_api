@@ -47,14 +47,15 @@ def list_user(req, db, context):
         # 如果没给出dept_id, 显示该管理员管理的所有部门的用户
         depts = context['dept_ids']
 
-    users = db.query(User).filter(User.dept_id.in_(depts))
+    users = db.query(User).filter(User.dept_id.in_(depts), User.deleted==0)
     return obj_array_to_json(users, 'users')
 
 
 @pre_check
 def show_user(req, db, context, user_id):
     user = db.query(User).filter(User.dept_id.in_(context['dept_ids']),
-                                 User.id==user_id).first()
+                                 User.id==user_id, 
+                                 User.deleted==0).first()
     if user == None: 
         raise UserNotFoundError(user_id)
     return obj_to_json(user, 'user')

@@ -17,6 +17,7 @@ from error import NotDeptAdminError
 from error import DeptNotEmptyError
 from error import ParentCannotBeSelfError
 from error import DeptHasChildrenError
+from error import CannotDeleteHeadDeptError
 from model import Dept
 from model import User
 
@@ -114,6 +115,10 @@ def update_dept(req, db, context, dept_id):
 def delete_dept(req, db, context, dept_id):
     dept_id = int(dept_id)
     result = db.query(Dept).filter(Dept.id==dept_id, Dept.deleted==0)
+
+    if dept_id == 1:
+        raise CannotDeleteHeadDeptError(dept_id)
+    
     if result.count() == 0:
         raise DeptNotFoundError(dept_id)        
     dept = result.first()
