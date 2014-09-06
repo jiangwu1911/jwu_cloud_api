@@ -19,11 +19,13 @@ from error import UsernameAlreadyExistError
 from error import EmailAlreadyExistError
 from error import RolePermissionDenyError
 from error import DatabaseError
+from error import CannotModifyAdminError
 from model import User
 from model import Role
 from model import UserRoleMembership
 from utils import obj_array_to_json
 from utils import obj_to_json
+from utils import tuple_to_dict
 from actions.auth import delete_token
 from actions.auth import generate_token
 
@@ -47,18 +49,28 @@ def list_user(req, db, context):
         # 如果没给出dept_id, 显示该管理员管理的所有部门的用户
         depts = context['dept_ids']
 
-    users = db.query(User).filter(User.dept_id.in_(depts), User.deleted==0)
-    return obj_array_to_json(users, 'users')
+    results = db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
+                       .filter(User.dept_id.in_(depts), 
+                               User.deleted==0,
+                               User.id==UserRoleMembership.user_id,
+                               Role.id==UserRoleMembership.role_id).all()
+    users = []
+    for item in results:
+        users.append(tuple_to_dict(item, 'id, name, password, email, dept_id, role_id, role_name'))
+    return {'users': users}
 
 
 @pre_check
 def show_user(req, db, context, user_id):
-    user = db.query(User).filter(User.dept_id.in_(context['dept_ids']),
-                                 User.id==user_id, 
-                                 User.deleted==0).first()
+    user = db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
+                    .filter(User.dept_id.in_(context['dept_ids']),
+                            User.id==user_id, 
+                            User.deleted==0,
+                            User.id==UserRoleMembership.user_id,
+                            Role.id==UserRoleMembership.role_id).first()
     if user == None: 
         raise UserNotFoundError(user_id)
-    return obj_to_json(user, 'user')
+    return {'user': tuple_to_dict(user, 'id, name, password, email, dept_id, role_id, role_name')}
 
 
 @pre_check
@@ -137,12 +149,18 @@ def update_user(req, db, context, user_id):
 
     if dept_id:
         dept_id = int(dept_id)
+        if user.name=='admin' and user.dept_id!=dept_id:
+            raise CannotModifyAdminError
+
         if is_dept_admin(context, dept_id) == False:
             raise NotDeptAdminError(dept_id)
         user.dept_id = dept_id
 
     if role_id:
         role_id = int(role_id)
+        if user.name == 'admin' and role_id!=1:
+            raise CannotModifyAdminError
+
         operator_role_id = int(context['membership'].role_id)
         if role_id < operator_role_id:
             # 部门管理员不能授予用户系统管理员的权限
@@ -165,6 +183,9 @@ def delete_user(req, db, context, user_id):
                                  User.id==user_id).first()
     if user == None:
         raise UserNotFoundError(user_id)
+
+    if user.name == 'admin':
+        raise CannotModifyAdminError
     
     user.deleted = 1
     db.add(user)

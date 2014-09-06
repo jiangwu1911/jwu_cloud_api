@@ -20,3 +20,10 @@ def obj_array_to_json(results, name):
 
 def obj_to_json(result, name):
     return {name: result.to_dict()}
+
+
+def tuple_to_dict(values, names):
+    ret = {}
+    for i, name in enumerate(names.split(',')):
+        ret[name.strip()] = values[i]
+    return ret

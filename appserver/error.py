@@ -126,6 +126,12 @@ class RolePermissionDenyError(HTTPError):
         super(RolePermissionDenyError, self).__init__(403, msg)
 
 
+class CannotModifyAdminError(HTTPError):
+    def __init__(self):
+        msg = "不允许修改缺省系统管理员admin的部门和权限。"
+        super(CannotModifyAdminError, self).__init__(403, msg)
+
+
 #----- OpenStack related -----
 class CannotConnectToOpenStackError(HTTPError):
     def __init__(self):
