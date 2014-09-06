@@ -139,22 +139,34 @@ class CannotConnectToOpenStackError(HTTPError):
         super(CannotConnectToOpenStackError, self).__init__(500, msg)
 
 
+class OpenStackError(HTTPError):
+    def __init__(self, error):
+        msg = "OpenStack错误: %s" % error
+        super(OpenStackError, self).__init__(500, msg)
+
+
 class FlavorNotFoundError(HTTPError):
     def __init__(self, flavor):
-        msg = "虚拟机类型'%s'不存在。" % flavor
-        super(FlavorNotFoundError, self).__init__(403, msg)
+        msg = "云主机类型'%s'不存在。" % flavor
+        super(FlavorNotFoundError, self).__init__(404, msg)
+
+
+class FlavorAlreadyExistError(HTTPError):
+    def __init__(self, flavor):
+        msg = "云主机类型'%s'已存在。" % flavor
+        super(FlavorAlreadyExistError, self).__init__(400, msg)
 
 
 class ImageNotFoundError(HTTPError):
     def __init__(self, image):
         msg = "镜像'%s'不存在。" % image
-        super(ImageNotFoundError, self).__init__(403, msg)
+        super(ImageNotFoundError, self).__init__(404, msg)
 
 
 class ServerNotFoundError(HTTPError):
     def __init__(self, server):
-        msg = "虚拟机'%s'不存在。" % server
-        super(ServerNotFoundError, self).__init__(403, msg)
+        msg = "云主机'%s'不存在。" % server
+        super(ServerNotFoundError, self).__init__(404, msg)
 
 
 class UnsupportedOperationError(HTTPError):

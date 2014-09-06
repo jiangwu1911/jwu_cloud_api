@@ -61,7 +61,7 @@ def show_dept(req, db, context, dept_id):
 
 
 @pre_check
-def add_dept(req, db, context):
+def create_dept(req, db, context):
     name = get_required_input(req, 'name')
     desc = get_required_input(req, 'desc')
     parent_id = int(get_required_input(req, 'parent_id'))

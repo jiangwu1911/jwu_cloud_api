@@ -28,6 +28,8 @@ def define_route(app):
         # 允许跨域访问
         pass
         
+
+    #---------- auth related ----------
     @app.post('/login')
     def login(db):
         response.content_type = "application/json"
@@ -42,7 +44,8 @@ def define_route(app):
     def list_role(db):
         return auth.list_role(request, db)
 
-    #----- dept related -----
+
+    #---------- dept related ----------
     @app.get('/depts')
     def list_dept(db):
         return dept.list_dept(request, db)
@@ -52,8 +55,8 @@ def define_route(app):
         return dept.show_dept(request, db, dept_id)
 
     @app.post('/depts')
-    def add_dept(db):
-        return dept.add_dept(request, db)
+    def create_dept(db):
+        return dept.create_dept(request, db)
 
     @app.post('/depts/:dept_id')
     def update_dept(db, dept_id):
@@ -63,7 +66,8 @@ def define_route(app):
     def delete_dept(db, dept_id):
         return dept.delete_dept(request, db, dept_id)
 
-    #----- user related -----
+
+    #---------- user related ----------
     @app.get('/users')
     def list_user(db):
         return user.list_user(request, db)
@@ -73,8 +77,8 @@ def define_route(app):
         return user.show_user(request, db, user_id)
 
     @app.post('/users')
-    def add_user(db):
-        return user.add_user(request, db)
+    def create_user(db):
+        return user.create_user(request, db)
 
     @app.post('/users/:user_id')
     def update_user(db, user_id):
@@ -84,15 +88,28 @@ def define_route(app):
     def delete_user(db, user_id):
         return user.delete_user(request, db, user_id)
 
-    #------ OpenStack related -----
+
+    #----------- OpenStack flavor related ----------
     @app.get('/flavors')
     def list_flavor(db):
         return openstack.list_flavor(request, db)
  
+    @app.post('/flavors')
+    def create_flavor(db):
+        return openstack.create_flavor(request, db)
+ 
+    @app.delete('/flavors/:flavor_id')
+    def create_flavor(db, flavor_id):
+        return openstack.delete_flavor(request, db, flavor_id)
+
+
+    #----------- OpenStack image related ----------
     @app.get('/images')
     def list_image(db):
         return openstack.list_image(request, db)
  
+
+    #----------- OpenStack server related ----------
     @app.get('/servers')
     def list_server(db):
         return openstack.list_server(request, db)

@@ -15,6 +15,10 @@ openstack_api = {
     'user': 'user01',
     'password': 'abc123',
     'tenant_name': 'project01',
+
+    'admin_user': 'admin',
+    'admin_password': 'admin',
+    'admin_tenant_name': 'admin',
 }
 
 openstack_message_queue = {

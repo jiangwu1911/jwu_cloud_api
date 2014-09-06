@@ -191,7 +191,7 @@ class DeptTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )
         error = json.loads(content)['error']
-        self.assertEqual(error['code'], "403", 'test_delete_dept_no_permission failed')
+        self.assertEqual(error['code'], "400", 'test_delete_dept_no_permission failed')
 
 
     def test_update_dept_not_found(self):

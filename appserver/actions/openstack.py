@@ -16,6 +16,8 @@ from error import ImageNotFoundError
 from error import ServerNotFoundError
 from error import DatabaseError
 from error import UnsupportedOperationError
+from error import FlavorAlreadyExistError
+from error import OpenStackError
 from utils import obj_array_to_json
 from utils import obj_to_json
 from novaclient import exceptions
@@ -31,16 +33,30 @@ nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
                               project_id = conf.openstack_api['tenant_name']
                              )
 
+# 某些操作, 比如创建flavor, 只能用admin身份做
+admin_nova_client =  nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
+                              username = conf.openstack_api['admin_user'],
+                              api_key = conf.openstack_api['admin_password'],
+                              project_id = conf.openstack_api['admin_tenant_name']
+                             )
+
+
 def openstack_call(func):
     def _deco(*args):
         try:
-            ret = func(*args)
+            return func(*args)
+
         except (exceptions.ConnectionRefused, exceptions.Unauthorized) as e:
             log.error(e)
             raise CannotConnectToOpenStackError()
-        return ret 
+
+        except (exceptions.ClientException ) as e:
+            raise OpenStackError(e)
+
     return _deco
 
+
+# ---------------------- Flavor related ---------------------------
 
 @pre_check
 @openstack_call
@@ -51,10 +67,38 @@ def list_flavor(req, db, context):
 
 @pre_check
 @openstack_call
+def create_flavor(req, db, context):
+    name = get_required_input(req, 'name')
+    vcpus = get_required_input(req, 'vcpus')
+    ram = get_required_input(req, 'ram')
+    disk = get_required_input(req, 'disk')
+    ephemeral = get_input(req, 'OS-FLV-EXT-DATA:ephemeral') 
+    swap = get_input(req, 'swap')
+
+    flavor = admin_nova_client.flavors.create(name, ram, vcpus, disk,
+                                              flavorid='auto', 
+                                              ephemeral=ephemeral,
+                                              swap=swap,
+                                              is_public=True)
+    return {'flavor': flavor.to_dict()}
+
+
+@pre_check
+@openstack_call
+def delete_flavor(req, db, context, flavor_id):
+    admin_nova_client.flavors.delete(flavor_id)
+
+
+# ---------------------- Image related ---------------------------
+
+@pre_check
+@openstack_call
 def list_image(req, db, context):
     objs = nova_client.images.list()
     return {'images': [o.to_dict() for o in objs if o]}
 
+
+# ---------------------- Server related ---------------------------
 
 @pre_check
 @openstack_call

@@ -74,7 +74,7 @@ def show_user(req, db, context, user_id):
 
 
 @pre_check
-def add_user(req, db, context):
+def create_user(req, db, context):
     name = get_required_input(req, 'username')
     password = get_required_input(req, 'password')
     email = get_input(req, 'email')

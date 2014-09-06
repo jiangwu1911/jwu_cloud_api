@@ -10,7 +10,7 @@ from urllib import urlencode
 from test_base import BaseTestCase
 
 
-class LoginTestCase(BaseTestCase):
+class OpenStackTestCase(BaseTestCase):
     def test_list_flavor(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
@@ -62,7 +62,7 @@ class LoginTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )
         error = json.loads(content)['error']
-        self.assertEqual(error['code'], "403", 'test_create_server_flavor_not_found failed')
+        self.assertEqual(error['code'], "404", 'test_create_server_flavor_not_found failed')
 
 
     def test_create_server_image_not_found(self):
@@ -77,7 +77,7 @@ class LoginTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )
         error = json.loads(content)['error']
-        self.assertEqual(error['code'], "403", 'test_create_server_image_not_found failed')
+        self.assertEqual(error['code'], "404", 'test_create_server_image_not_found failed')
 
 
     def test_create_server(self):
