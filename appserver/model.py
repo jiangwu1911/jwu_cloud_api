@@ -161,6 +161,7 @@ class Server(Base, JsonObj):
     swap = Column(Integer)
     vcpus = Column(Integer)
     ip = Column(String(100))
+    fault = Column(String(500))
     console_url = Column(String(200))
     deleted = Column(Integer)
     created_by = Column(Integer)   # Who created this server
@@ -169,7 +170,7 @@ class Server(Base, JsonObj):
     deleted_at = Column(DateTime)
     
     def __init__(self, creator=0, owner=0, name='', instance_id='', state='', task_state='',
-                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', console_url='', deleted=0,
+                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', console_url='', fault='', deleted=0,
                  created_by=0, created_at='0000-00-00 00:00:00', 
                  updated_at='0000-00-00 00:00:00', 
                  deleted_at='0000-00-00 00:00:00'):
@@ -186,6 +187,7 @@ class Server(Base, JsonObj):
         self.vcpus = vcpus
         self.ip = ip
         self.console_url = console_url
+        self.falut = fault
         self.deleted = deleted
         self.created_by = created_by
         self.created_at = created_at
@@ -194,7 +196,7 @@ class Server(Base, JsonObj):
 
     def __repr__(self): 
         return("<Server(%d, %d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
-                %d, '%s', '%s', %d, %d, '%s', '%s', '%s')>"
+                %d, '%s', '%s', '%s', %d, %d, '%s', '%s', '%s')>"
               % (self.id,
                  self.creator,
                  self.owner,
@@ -209,6 +211,7 @@ class Server(Base, JsonObj):
                  self.vcpus,
                  self.ip,
                  self.console_url,
+                 self.fault,
                  self.deleted,
                  self.created_by,
                  self.created_at,

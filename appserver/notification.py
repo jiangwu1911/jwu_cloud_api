@@ -9,6 +9,7 @@ from model import Server
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 import settings as conf
+import novaclient.v1_1.client as nvclient
 
 log = logging.getLogger("cloudapi")
 
@@ -32,24 +33,34 @@ class NovaWorker(Worker):
 
     def process_task(self, body, message):
         Session = sessionmaker(self.db_engine)
-        session = Session()
+        db = Session()
     
         # Save notification in database
         payload = body.get('payload')
-        #log.debug(payload);
+        event_type = body.get('event_type', '')
+        #log.debug(body);
         notification = NovaNotification(
                         message_id = body.get('message_id', ''),
                         occurred_at = body.get('timestamp', ''),
-                        event_type = body.get('event_type', ''),
+                        event_type = event_type,
                         instance_id = payload.get('instance_id', ''),
                         state = payload.get('state', ''),
                         old_state = payload.get('old_state', ''),
                         new_task_state = payload.get('new_task_state', ''),
                         old_task_state = payload.get('old_task_state', ''))
-        session.add(notification)
-        session.commit()
+        db.add(notification)
+        db.commit()
 
-        server = session.query(Server).filter(Server.instance_id==notification.instance_id).first()
+        if event_type == 'compute.instance.update':
+            self.update_server_state(db, notification);
+        elif event_type == 'compute.instance.delete.end':
+            self.delete_server(db, notification);
+
+        db.close()
+
+
+    def update_server_state(self, db, notification):
+        server = db.query(Server).filter(Server.instance_id==notification.instance_id).first()
         if server:
             # Update server state
             server.state = notification.state
@@ -59,32 +70,49 @@ class NovaWorker(Worker):
             if notification.state=='deleted':
                 server.deleted = 1
                 server.deleted_at = datetime.datetime.now()
+            db.add(server)
+            db.commit()
 
-            session.add(server)
-            session.commit()
-
-            if notification.state=='active':
-                # Get server's IP
-                import novaclient.v1_1.client as nvclient
-                nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
-                                              username = conf.openstack_api['user'],
-                                              api_key = conf.openstack_api['password'],
-                                              project_id = conf.openstack_api['tenant_name']
+            nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
+                                          username = conf.openstack_api['user'],
+                                          api_key = conf.openstack_api['password'],
+                                          project_id = conf.openstack_api['tenant_name']
                                              )
-                try:
-                    instance = nova_client.servers.get(notification.instance_id).to_dict()
+            try:
+                instance = nova_client.servers.get(notification.instance_id).to_dict()
+
+                if notification.state == 'active':
+                    # Get server's IP
                     ips = []
                     for net in instance.get('addresses').values():
                         for n in net:
                             if n.get('addr'):
                                 ips.append(n.get('addr'))
                     server.ip = ','.join(ips)
-                    session.add(server)
-                    session.commit()
-                except Exception, e:
-                    log.info(e)
 
-        session.close()
+                if notification.state == 'error':
+                    code = instance.get('fault')['code']
+                    msg = instance.get('fault')['message']
+                    server.fault = 'Error %d: %s' % (code, msg)
+
+                db.add(server)
+                db.commit()
+
+            except Exception, e:
+                log.info(e)
+
+    
+    def delete_server(self, db, notification):
+        server = db.query(Server).filter(Server.instance_id==notification.instance_id).first()
+        if server:
+            # Update server state
+            server.updated_at = datetime.datetime.now()
+            server.deleted = 1
+            server.deleted_at = datetime.datetime.now()
+
+            db.add(server)
+            db.commit()
+ 
 
         
 class NotifyListener(threading.Thread):

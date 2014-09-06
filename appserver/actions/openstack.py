@@ -227,7 +227,11 @@ def delete_server(req, db, context, server_id):
     try:
         nova_client.servers.delete(server.instance_id)
     except exceptions.NotFound, e:
-        raise ServerNotFoundError(server_id)
+        # server在openstack中已被删除
+        server.deleted = 1
+        server.deleted_at = datetime.datetime.now()
+        db.add(server)
+        db.commit()
 
     try:
         write_operation_log(db,
