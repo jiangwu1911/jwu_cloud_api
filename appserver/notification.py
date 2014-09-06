@@ -36,6 +36,7 @@ class NovaWorker(Worker):
     
         # Save notification in database
         payload = body.get('payload')
+        #log.debug(payload);
         notification = NovaNotification(
                         message_id = body.get('message_id', ''),
                         occurred_at = body.get('timestamp', ''),

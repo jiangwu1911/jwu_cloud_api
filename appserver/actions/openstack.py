@@ -212,7 +212,6 @@ def create_server(req, db, context):
     except Exception, e:
         handle_db_error(db, e)
 
-    log.debug(server)
     return obj_to_json(server, 'server')
 
 
@@ -253,12 +252,26 @@ def update_server(req, db, context, server_id):
 
     action = get_input(req, 'action') 
     if action:
-        if action == "suspend":
-            suspend_server(server)
-        elif action == "resume":
-            resume_server(server)
+        if action == 'start':
+            return start_server(server)
+        elif action == 'stop':
+            return stop_server(server)
+        elif action == 'suspend':
+            return suspend_server(server)
+        elif action == 'resume':
+            return resume_server(server)
+        elif action == 'get_console':
+            return get_console(req, db, server)
         else:
             raise UnsupportedOperationError(action)
+
+
+def start_server(server):
+    nova_client.servers.start(server.instance_id) 
+
+
+def stop_server(server):
+    nova_client.servers.stop(server.instance_id)
 
 
 def suspend_server(server):
@@ -267,3 +280,16 @@ def suspend_server(server):
 
 def resume_server(server):
     nova_client.servers.resume(server.instance_id)
+
+
+def get_console(req, db, server):
+    console_type = get_input(req, 'console_type');
+    if console_type==None or console_type=='':
+        console_type = 'novnc'
+
+    ret = nova_client.servers.get_vnc_console(server.instance_id,
+                                              console_type)
+    server.console_url = ret['console']['url']
+    db.add(server)
+    db.commit()
+    return ret
