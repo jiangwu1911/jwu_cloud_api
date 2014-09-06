@@ -98,6 +98,10 @@ def define_route(app):
     def create_flavor(db):
         return openstack.create_flavor(request, db)
  
+    @app.post('/flavors/:flavor_id')
+    def update_flavor(db, flavor_id):
+        return openstack.update_flavor(request, db, flavor_id)
+ 
     @app.delete('/flavors/:flavor_id')
     def create_flavor(db, flavor_id):
         return openstack.delete_flavor(request, db, flavor_id)

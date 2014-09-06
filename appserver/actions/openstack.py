@@ -50,7 +50,7 @@ def openstack_call(func):
             log.error(e)
             raise CannotConnectToOpenStackError()
 
-        except (exceptions.ClientException ) as e:
+        except (exceptions.ClientException, exceptions.CommandError) as e:
             raise OpenStackError(e)
 
     return _deco
@@ -62,7 +62,16 @@ def openstack_call(func):
 @openstack_call
 def list_flavor(req, db, context):
     objs = nova_client.flavors.list()
-    return {'flavors': [o.to_dict() for o in objs if o]}
+
+    flavors = []
+    for o in objs:
+        d = o.to_dict()
+        d['ephemeral'] = d['OS-FLV-EXT-DATA:ephemeral']
+        if d['swap'] == '':
+            d['swap'] = 0
+        flavors.append(d)
+        
+    return {'flavors': flavors}
 
 
 @pre_check
@@ -72,7 +81,7 @@ def create_flavor(req, db, context):
     vcpus = get_required_input(req, 'vcpus')
     ram = get_required_input(req, 'ram')
     disk = get_required_input(req, 'disk')
-    ephemeral = get_input(req, 'OS-FLV-EXT-DATA:ephemeral') 
+    ephemeral = get_input(req, 'ephemeral') 
     swap = get_input(req, 'swap')
 
     flavor = admin_nova_client.flavors.create(name, ram, vcpus, disk,
@@ -87,6 +96,39 @@ def create_flavor(req, db, context):
 @openstack_call
 def delete_flavor(req, db, context, flavor_id):
     admin_nova_client.flavors.delete(flavor_id)
+
+
+@pre_check
+@openstack_call
+def update_flavor(req, db, context, flavor_id):
+    name = get_input(req, 'name')
+    vcpus = get_input(req, 'vcpus')
+    ram = get_input(req, 'ram')
+    disk = get_input(req, 'disk')
+    ephemeral = get_input(req, 'ephemeral')
+    swap = get_input(req, 'swap')
+
+    if name==None or name=='':
+        name = f.name
+    if vcpus==None or name=='':
+        vcpus = f.vcpus
+    if ram==None or ram=='':
+        ram = f.ram
+    if disk==None or disk=='':
+        disk = f.disk
+    if ephemeral==None or ephemeral=='':
+        ephemeral = f.ephemeral
+    if swap==None or swap=='':
+        swap = f.swap
+
+    admin_nova_client.flavors.delete(flavor_id)
+        
+    flavor = admin_nova_client.flavors.create(name, int(ram), int(vcpus), int(disk),
+                                              flavorid=flavor_id,
+                                              ephemeral=int(ephemeral),
+                                              swap=int(swap),
+                                              is_public=True)
+    return {'flavor': flavor.to_dict()}
 
 
 # ---------------------- Image related ---------------------------
