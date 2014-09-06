@@ -62,5 +62,18 @@ class LoginTestCase(BaseTestCase):
         self.assertTrue(len(users)>2, 'test_list_role failed')
 
 
+    def test_login_sql_injection(self):
+        content = self.get_token('admin', "admin'1")
+        token = json.loads(content)['success']['token']
+        self.assertTrue(len(token)>0, 'test login failed')
+
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "logout",
+                                  "POST",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+
+
 if __name__ == "__main__":
     unittest.main()
