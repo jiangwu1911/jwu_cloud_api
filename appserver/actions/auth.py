@@ -10,6 +10,7 @@ import settings as conf
 from error import UserNotFoundOrPasswordError
 from error import RoleNotFoundError
 from common import get_required_input
+from utils import obj_array_to_json
 
 
 log = logging.getLogger("cloudapi")
@@ -66,3 +67,9 @@ def logout(req, db):
     token = req.get_header('X-Auth-Token')
     delete_token(db, token)
     return {'success': 'token deleted.'}
+
+
+def list_role(req, db):
+    roles = db.query(Role)
+    return obj_array_to_json(roles, 'roles')
+ 

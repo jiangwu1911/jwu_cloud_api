@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import sys
 import unittest
 import json
@@ -46,6 +48,18 @@ class LoginTestCase(BaseTestCase):
                                   "POST",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token})
+
+    def test_list_role(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "roles",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        users = json.loads(content)['roles']
+        self.assertTrue(len(users)>2, 'test_list_role failed')
 
 
 if __name__ == "__main__":

@@ -38,6 +38,10 @@ def define_route(app):
         response.content_type = "application/json"
         return auth.logout(request, db)
 
+    @app.get('/roles')
+    def list_role(db):
+        return auth.list_role(request, db)
+
     #----- dept related -----
     @app.get('/depts')
     def list_dept(db):
