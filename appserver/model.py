@@ -149,6 +149,8 @@ class Server(Base, JsonObj):
     """VM in OpenStack"""
     __tablename__ = 'server'
     id = Column(Integer, Sequence('seq_pk'), primary_key=True)
+    image = Column(String(200))
+    flavor = Column(String(200))
     creator = Column(Integer)   # Who created this server
     owner = Column(Integer)     # Currently who own this server
     name = Column(String(100), nullable=False)
@@ -169,11 +171,13 @@ class Server(Base, JsonObj):
     updated_at = Column(DateTime)
     deleted_at = Column(DateTime)
     
-    def __init__(self, creator=0, owner=0, name='', instance_id='', state='', task_state='',
+    def __init__(self, image='', flavor='', creator=0, owner=0, name='', instance_id='', state='', task_state='',
                  ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', console_url='', fault='', deleted=0,
                  created_by=0, created_at='0000-00-00 00:00:00', 
                  updated_at='0000-00-00 00:00:00', 
                  deleted_at='0000-00-00 00:00:00'):
+        self.image = image
+        self.flavor = flavor
         self.creator = creator
         self.owner = owner
         self.name = name
@@ -195,11 +199,13 @@ class Server(Base, JsonObj):
         self.deleted_at = deleted_at
 
     def __repr__(self): 
-        return("<Server(%d, %d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
+        return("<Server(%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
                 %d, '%s', '%s', '%s', %d, %d, '%s', '%s', '%s')>"
               % (self.id,
                  self.creator,
                  self.owner,
+                 self.image,
+                 self.flavor,
                  self.name,
                  self.instance_id,
                  self.state,

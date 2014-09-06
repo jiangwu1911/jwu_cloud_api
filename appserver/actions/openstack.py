@@ -3,6 +3,7 @@
 import traceback
 import novaclient.v1_1.client as nvclient
 import datetime
+from sqlalchemy.sql import or_
 
 import logging
 from common import pre_check
@@ -145,7 +146,8 @@ def list_image(req, db, context):
 @pre_check
 @openstack_call
 def list_server(req, db, context):
-    servers = db.query(Server).filter(Server.owner==context['user'].id,
+    servers = db.query(Server).filter(or_(Server.owner==context['user'].id,
+                                          Server.creator==context['user'].id),
                                       Server.deleted==0).all()
     return obj_array_to_json(servers, 'servers')
 
@@ -153,7 +155,8 @@ def list_server(req, db, context):
 @pre_check
 @openstack_call
 def show_server(req, db, context, server_id):
-    server = db.query(Server).filter(Server.owner==context['user'].id,
+    server = db.query(Server).filter(or_(Server.owner==context['user'].id,
+                                          Server.creator==context['user'].id),
                                      Server.deleted==0,
                                      Server.id==server_id).first()
     if server == None:
@@ -185,8 +188,10 @@ def create_server(req, db, context):
     flavor = flavor.to_dict()
     instance = nova_client.servers.get(instance).to_dict()
     server = Server(creator = context['user'].id,
-                    owner = context['user'].id,
+                    owner = None,  
                     name = server_name,
+                    image = image_name,
+                    flavor = flavor_name,
                     instance_id = instance.get('id', None),
                     state = instance.get('OS-EXT-STS:vm_state', None),
                     task_state = instance.get('OS-EXT-STS:task_state', None),
@@ -218,7 +223,8 @@ def create_server(req, db, context):
 @pre_check
 @openstack_call
 def delete_server(req, db, context, server_id):
-    server = db.query(Server).filter(Server.owner==context['user'].id,
+    server = db.query(Server).filter(or_(Server.owner==context['user'].id,
+                                          Server.creator==context['user'].id),
                                      Server.deleted==0,
                                      Server.id==server_id).first()
     if server == None:
@@ -248,11 +254,23 @@ def delete_server(req, db, context, server_id):
 @pre_check
 @openstack_call
 def update_server(req, db, context, server_id):
-    server = db.query(Server).filter(Server.owner==context['user'].id,
+    server = db.query(Server).filter(or_(Server.owner==context['user'].id,
+                                          Server.creator==context['user'].id),
                                      Server.deleted==0,
                                      Server.id==server_id).first()
     if server == None:
         raise ServerNotFoundError(server_id)
+
+    name = get_input(req, 'name')
+    if name:
+        server.name = name
+    
+    owner = get_input(req, 'owner')
+    if owner:
+        server.owner = owner
+
+    db.add(server)
+    db.commit()
 
     action = get_input(req, 'action') 
     if action:
