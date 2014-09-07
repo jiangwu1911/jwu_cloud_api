@@ -16,6 +16,7 @@ import model
 import urls
 import data
 from notification import NovaNotifyListener
+from notification import CinderNotifyListener
 
 
 VERSION ="0.1"
@@ -62,8 +63,12 @@ def start_server():
 
 def start_notify_listener():
     engine = create_db_engine()
+
     nova_listener = NovaNotifyListener(engine)
     nova_listener.start()
+
+    cinder_listener = CinderNotifyListener(engine)
+    cinder_listener.start()
 
 
 def init_db(testdata=False):

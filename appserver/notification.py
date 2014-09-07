@@ -112,9 +112,24 @@ class NovaWorker(Worker):
 
             db.add(server)
             db.commit()
+
+
+class CinderWorker(Worker):
+    def get_consumers(self, Consumer, channel):
+        exchange = Exchange('cinder', type='topic', durable=False,
+                            auto_delete=False, internal=False)
+        queues = [Queue('cloudapi_cinder', exchange,
+                        routing_key='notifications.info',
+                        no_ack=True)]
+        return [Consumer(queues=queues,
+                         accept=['json'],
+                         callbacks=[self.process_task])]
+
+    def process_task(self, body, message):
+        event_type = body.get('event_type', '')
+        log.debug(body)
  
 
-        
 class NotifyListener(threading.Thread):
     def __init__(self, db_engine):
         threading.Thread.__init__(self)
@@ -132,6 +147,21 @@ class NovaNotifyListener(NotifyListener):
         with Connection(url) as conn:
             try:
                 worker = NovaWorker(conn, self.db_engine)
+                worker.run()
+            except KeyboardInterrupt:
+                pass
+
+
+class CinderNotifyListener(NotifyListener):
+    def run(self):
+        mq = conf.openstack_message_queue
+        url = "amqp://%s:%s@%s:%d//" % (mq['nova_user'],
+                                        mq['nova_password'],
+                                        mq['host'],
+                                        mq['port'])
+        with Connection(url) as conn:
+            try:
+                worker = CinderWorker(conn, self.db_engine)
                 worker.run()
             except KeyboardInterrupt:
                 pass
