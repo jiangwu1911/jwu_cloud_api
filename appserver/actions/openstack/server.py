@@ -12,6 +12,7 @@ from actions.common import handle_db_error
 from actions.common import write_operation_log
 from actions.common import is_sys_admin_or_dept_admin
 from actions.common import pre_check
+from actions.user import find_user
 from utils import obj_to_json
 from utils import obj_array_to_json
 from error import ServerNotFoundError

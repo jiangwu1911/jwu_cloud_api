@@ -50,8 +50,8 @@ class OpenStackHostTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )
         print content
-        hypervisors = json.loads(content)['hypervisors']
-        self.assertTrue(hypervisors, 'test_list_hypervisor failed')
+        data = json.loads(content)['hypervisor_stats']
+        self.assertTrue(len(data)>=1, 'test_list_hypervisor failed')
 
 
 if __name__ == "__main__":
