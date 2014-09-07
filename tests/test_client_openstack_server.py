@@ -10,7 +10,7 @@ from urllib import urlencode
 from test_base import BaseTestCase
 
 
-class OpenStackFlavorTestCase(BaseTestCase):
+class OpenStackServerTestCase(BaseTestCase):
     def test_get_console(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']

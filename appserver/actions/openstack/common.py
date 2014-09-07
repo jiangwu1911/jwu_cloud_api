@@ -2,20 +2,10 @@
 
 import traceback
 import novaclient.v1_1.client as nvclient
-import datetime
-from sqlalchemy.sql import or_
 
 import logging
-from actions.common import get_input
-from actions.common import get_required_input
-from actions.common import handle_db_error
-from actions.common import write_operation_log
-from actions.common import is_sys_admin_or_dept_admin
-from actions.user import find_user
 from error import CannotConnectToOpenStackError
 from error import OpenStackError
-from utils import obj_array_to_json
-from utils import obj_to_json
 from novaclient import exceptions
 import settings as conf
 

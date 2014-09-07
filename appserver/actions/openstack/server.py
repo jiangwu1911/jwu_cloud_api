@@ -75,6 +75,8 @@ def update_flavor(req, db, context, flavor_id):
     ephemeral = get_input(req, 'ephemeral')
     swap = get_input(req, 'swap')
 
+    f = nova_client.flavors.get(flavor_id)
+
     if name==None or name=='':
         name = f.name
     if vcpus==None or name=='':
@@ -87,6 +89,8 @@ def update_flavor(req, db, context, flavor_id):
         ephemeral = f.ephemeral
     if swap==None or swap=='':
         swap = f.swap
+        if swap == '':
+            swap = 0
 
     admin_nova_client.flavors.delete(flavor_id)
         

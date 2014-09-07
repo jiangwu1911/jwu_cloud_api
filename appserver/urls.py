@@ -6,6 +6,7 @@ from actions import auth
 from actions import user
 from actions import dept
 from actions.openstack import server
+from actions.openstack import host
 import model
 import utils
 
@@ -133,3 +134,9 @@ def define_route(app):
     @app.delete('/servers/:server_id')
     def delete_server(db, server_id):
         return server.delete_server(request, db, server_id)
+
+
+    #----------- OpenStack hypervisor related ----------
+    @app.get('/hosts')
+    def list_hypervisor(db):
+        return host.list_hypervisor(request, db)

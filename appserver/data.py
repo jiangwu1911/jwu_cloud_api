@@ -159,5 +159,7 @@ def insert_test_data(engine):
     session.add(Permission(path='^/servers/.*', role_id=dept_admin_role.id, method='DELETE'))
     session.add(Permission(path='^/servers/.*', role_id=user_role.id, method='DELETE'))
 
+    session.add(Permission(path='^/hosts$', role_id=sys_admin_role.id, method='GET'))
+
     session.commit()
     session.close()
