@@ -159,15 +159,26 @@ def list_server(req, db, context):
     return obj_array_to_json(servers, 'servers')
 
 
+def find_server(db, context, server_id):
+    if is_sys_admin_or_dept_admin(context):
+        # 管理员可以看到部门下面所有机器
+        server = db.query(Server).filter(Server.dept.in_(context['dept_ids']),
+                                         Server.deleted==0,
+                                         Server.id==server_id).first()
+    else:
+        # 普通用户只能看到属于自己的机器
+        server = db.query(Server).filter(Server.owner==context['user'].id,
+                                         Server.deleted==0,
+                                         Server.id==server_id).first()
+    if server == None:
+        raise ServerNotFoundError(server_id)
+    return server
+
+
 @pre_check
 @openstack_call
 def show_server(req, db, context, server_id):
-    server = db.query(Server).filter(or_(Server.owner==context['user'].id,
-                                          Server.creator==context['user'].id),
-                                     Server.deleted==0,
-                                     Server.id==server_id).first()
-    if server == None:
-        raise ServerNotFoundError(server_id)
+    server = find_server(db, context, server_id);
     return obj_to_json(server, 'server')
 
 
@@ -231,13 +242,7 @@ def create_server(req, db, context):
 @pre_check
 @openstack_call
 def delete_server(req, db, context, server_id):
-    server = db.query(Server).filter(or_(Server.owner==context['user'].id,
-                                          Server.creator==context['user'].id),
-                                     Server.deleted==0,
-                                     Server.id==server_id).first()
-    if server == None:
-        raise ServerNotFoundError(server_id)
-
+    server = find_server(db, context, server_id);
     try:
         nova_client.servers.delete(server.instance_id)
     except exceptions.NotFound, e:
@@ -262,12 +267,7 @@ def delete_server(req, db, context, server_id):
 @pre_check
 @openstack_call
 def update_server(req, db, context, server_id):
-    server = db.query(Server).filter(or_(Server.owner==context['user'].id,
-                                          Server.creator==context['user'].id),
-                                     Server.deleted==0,
-                                     Server.id==server_id).first()
-    if server == None:
-        raise ServerNotFoundError(server_id)
+    server = find_server(db, context, server_id);
 
     name = get_input(req, 'name')
     if name:
