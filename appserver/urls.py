@@ -5,7 +5,7 @@ from bottle import route, get, post, delete, request, response, hook
 from actions import auth
 from actions import user
 from actions import dept
-from actions import openstack
+from actions.openstack import server
 import model
 import utils
 
@@ -92,44 +92,44 @@ def define_route(app):
     #----------- OpenStack flavor related ----------
     @app.get('/flavors')
     def list_flavor(db):
-        return openstack.list_flavor(request, db)
+        return server.list_flavor(request, db)
  
     @app.post('/flavors')
     def create_flavor(db):
-        return openstack.create_flavor(request, db)
+        return server.create_flavor(request, db)
  
     @app.post('/flavors/:flavor_id')
     def update_flavor(db, flavor_id):
-        return openstack.update_flavor(request, db, flavor_id)
+        return server.update_flavor(request, db, flavor_id)
  
     @app.delete('/flavors/:flavor_id')
     def create_flavor(db, flavor_id):
-        return openstack.delete_flavor(request, db, flavor_id)
+        return server.delete_flavor(request, db, flavor_id)
 
 
     #----------- OpenStack image related ----------
     @app.get('/images')
     def list_image(db):
-        return openstack.list_image(request, db)
+        return server.list_image(request, db)
  
 
     #----------- OpenStack server related ----------
     @app.get('/servers')
     def list_server(db):
-        return openstack.list_server(request, db)
+        return server.list_server(request, db)
 
     @app.get('/servers/:server_id')
     def show_server(db, server_id):
-        return openstack.show_server(request, db, server_id)
+        return server.show_server(request, db, server_id)
 
     @app.post('/servers')
     def list_server(db):
-        return openstack.create_server(request, db)
+        return server.create_server(request, db)
 
     @app.post('/servers/:server_id')
     def update_server(db, server_id):
-        return openstack.update_server(request, db, server_id)
+        return server.update_server(request, db, server_id)
 
     @app.delete('/servers/:server_id')
     def delete_server(db, server_id):
-        return openstack.delete_server(request, db, server_id)
+        return server.delete_server(request, db, server_id)

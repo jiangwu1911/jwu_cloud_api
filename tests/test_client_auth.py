@@ -63,16 +63,8 @@ class LoginTestCase(BaseTestCase):
 
 
     def test_login_sql_injection(self):
-        content = self.get_token('admin', "admin'1")
-        token = json.loads(content)['success']['token']
-        self.assertTrue(len(token)>0, 'test login failed')
-
-        h = httplib2.Http()
-        resp, content = h.request(self.base_url + "logout",
-                                  "POST",
-                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
-                                           'X-Auth-Token': token}
-                                 )
+        content = self.get_token("ad'min", "admin")
+        print content
 
 
 if __name__ == "__main__":

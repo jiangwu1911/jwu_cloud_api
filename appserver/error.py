@@ -132,6 +132,18 @@ class CannotModifyAdminError(HTTPError):
         super(CannotModifyAdminError, self).__init__(403, msg)
 
 
+class CannotDeleteSelfError(HTTPError):
+    def __init__(self):
+        msg = "用户不能删除自己。"
+        super(CannotDeleteSelfError, self).__init__(400, msg)
+
+
+class CannotDeleteUserWhoHasResourceError(HTTPError):
+    def __init__(self):
+        msg = "用户名下有云主机等资源，请先将资源转移给其它员工。"
+        super(CannotDeleteUserWhoHasResourceError, self).__init__(400, msg)
+
+
 #----- OpenStack related -----
 class CannotConnectToOpenStackError(HTTPError):
     def __init__(self):

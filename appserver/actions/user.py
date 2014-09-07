@@ -21,9 +21,12 @@ from error import EmailAlreadyExistError
 from error import RolePermissionDenyError
 from error import DatabaseError
 from error import CannotModifyAdminError
+from error import CannotDeleteSelfError
+from error import CannotDeleteUserWhoHasResourceError
 from model import User
 from model import Role
 from model import UserRoleMembership
+from model import Server
 from utils import obj_array_to_json
 from utils import obj_to_json
 from utils import tuple_to_dict
@@ -203,6 +206,14 @@ def update_user(req, db, context, user_id):
         handle_db_error(db, e)
 
 
+def user_own_resource(db, user_id):
+    count = db.query(Server).filter(Server.owner==user_id,
+                                    Server.deleted==0).count()
+    if count > 0:
+        return True
+    return False
+
+
 @pre_check
 def delete_user(req, db, context, user_id):
     user_id = int(user_id)
@@ -213,6 +224,12 @@ def delete_user(req, db, context, user_id):
 
     if user.name == 'admin':
         raise CannotModifyAdminError
+
+    if user_id == context['user'].id:
+        raise CannotDeleteSelfError
+
+    if user_own_resource(db, user_id):
+        raise CannotDeleteUserWhoHasResourceError
     
     user.deleted = 1
     db.add(user)

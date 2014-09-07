@@ -204,7 +204,7 @@ class Server(Base, JsonObj):
 
     def __repr__(self): 
         return("<Server(%d, %d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
-                %d, '%s', '%s', '%s', %d, %d, '%s', '%s', '%s')>"
+                #%d, '%s', '%s', '%s', %d, %d, '%s', '%s', '%s')>"
               % (self.id,
                  self.creator,
                  self.owner,
@@ -227,7 +227,8 @@ class Server(Base, JsonObj):
                  self.created_by,
                  self.created_at,
                  self.updated_at,
-                 self.deleted_at))
+                 self.deleted_at
+                ))
 
 
 class OperationLog(Base, JsonObj):
