@@ -3,5 +3,6 @@ MySQL-Python>=1.2.5
 SQLAlchemy>=0.9.7
 httplib2>=0.9
 python-novaclient>=2.18.1
+python-cinderclient>=1.0.9
 kombu>=3.0.21
 librabbitmq>=1.5.2

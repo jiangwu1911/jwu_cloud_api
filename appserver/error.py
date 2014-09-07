@@ -144,7 +144,7 @@ class CannotDeleteUserWhoHasResourceError(HTTPError):
         super(CannotDeleteUserWhoHasResourceError, self).__init__(400, msg)
 
 
-#----- OpenStack related -----
+#----- OpenStack server related -----
 class CannotConnectToOpenStackError(HTTPError):
     def __init__(self):
         msg = "无法连接到OpenStack。"
@@ -176,8 +176,8 @@ class ImageNotFoundError(HTTPError):
 
 
 class ServerNotFoundError(HTTPError):
-    def __init__(self, server):
-        msg = "云主机'%s'不存在。" % server
+    def __init__(self):
+        msg = "云主机不存在。" 
         super(ServerNotFoundError, self).__init__(404, msg)
 
 
@@ -185,3 +185,12 @@ class UnsupportedOperationError(HTTPError):
     def __init__(self, operation):
         msg = "'%s'操作不支持。" % operation
         super(UnsupportedOperationError, self).__init__(400, msg)
+
+
+#----- OpenStack volume related -----
+class VolumeNotFoundError(HTTPError):
+    def __init__(self, volume):
+        msg = "云硬盘不存在。"
+        super(VolumeNotFoundError, self).__init__(404, msg)
+
+

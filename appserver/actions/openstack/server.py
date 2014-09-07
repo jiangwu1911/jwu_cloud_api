@@ -1,14 +1,12 @@
 # -*- coding: UTF-8 -*-
 
 import traceback
-import novaclient.v1_1.client as nvclient
 import datetime
 from sqlalchemy.sql import or_
 
 import logging
 from actions.common import get_input
 from actions.common import get_required_input
-from actions.common import handle_db_error
 from actions.common import write_operation_log
 from actions.common import is_sys_admin_or_dept_admin
 from actions.common import pre_check
@@ -144,7 +142,7 @@ def find_server(db, context, server_id):
                                          Server.deleted==0,
                                          Server.id==server_id).first()
     if server == None:
-        raise ServerNotFoundError(server_id)
+        raise ServerNotFoundError
 
     if server.owner == 0:
         server.owner = ''
@@ -182,7 +180,6 @@ def create_server(req, db, context):
     flavor = flavor.to_dict()
     instance = nova_client.servers.get(instance).to_dict()
     server = Server(creator = context['user'].id,
-                    owner = '',  
                     dept = context['user'].dept_id, # 部门设置成创建者所属的部门
                     name = server_name,
                     image = image_name,
@@ -196,21 +193,17 @@ def create_server(req, db, context):
                     swap = 0,
                     vcpus = flavor.get('vcpus', 0),
                     ip = '',
-                    created_by = context['user'].id,
                     created_at = datetime.datetime.now())
 
-    try:
-        db.add(server)
-        db.commit()
-        write_operation_log(db,
-                            user_id = context['user'].id,
-                            resource_type = 'server', 
-                            resource_id = server.id,
-                            resource_uuid = instance['id'],
-                            event = 'create server')
-        db.commit()
-    except Exception, e:
-        handle_db_error(db, e)
+    db.add(server)
+    db.commit()
+    write_operation_log(db,
+                        user_id = context['user'].id,
+                        resource_type = 'server', 
+                        resource_id = server.id,
+                        resource_uuid = instance['id'],
+                        event = 'create server')
+    db.commit()
 
     log.debug(server)
     return obj_to_json(server, 'server')
@@ -229,16 +222,13 @@ def delete_server(req, db, context, server_id):
         db.add(server)
         db.commit()
 
-    try:
-        write_operation_log(db,
-                            user_id = context['user'].id,
-                            resource_type = 'server',
-                            resource_id = server_id,
-                            resource_uuid = server.instance_id,
-                            event = 'delete server')
-        db.commit() 
-    except Exception, e:
-        handle_db_error(db, e)
+    write_operation_log(db,
+                        user_id = context['user'].id,
+                        resource_type = 'server',
+                        resource_id = server_id,
+                        resource_uuid = server.instance_id,
+                        event = 'delete server')
+    db.commit() 
 
 
 @pre_check

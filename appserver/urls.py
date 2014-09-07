@@ -6,6 +6,7 @@ from actions import auth
 from actions import user
 from actions import dept
 from actions.openstack import server
+from actions.openstack import volume
 from actions.openstack import host
 import model
 import utils
@@ -134,6 +135,29 @@ def define_route(app):
     @app.delete('/servers/:server_id')
     def delete_server(db, server_id):
         return server.delete_server(request, db, server_id)
+
+
+    #---------- OpenStack Volume related ----------
+    @app.get('/volumes')
+    def list_volume(db):
+        return volume.list_volume(request, db)
+
+    @app.get('/volumes/:volume_id')
+    def show_volume(db, volume_id):
+        return volume.show_volume(request, db, volume_id)
+
+    @app.post('/volumes')
+    def list_volume(db):
+        return volume.create_volume(request, db)
+
+    @app.post('/volumes/:volume_id')
+    def update_volume(db, volume_id):
+        return volume.update_volume(request, db, volume_id)
+
+    @app.delete('/volumes/:volume_id')
+    def delete_volume(db, volume_id):
+        return volume.delete_volume(request, db, volume_id)
+
 
 
     #----------- OpenStack hypervisor related ----------
