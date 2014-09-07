@@ -7,7 +7,7 @@ import pprint
 from common import pre_check
 from common import get_input
 from common import get_required_input
-from common import is_dept_admin
+from common import is_dept_admin_of
 from utils import obj_array_to_json
 from utils import obj_to_json
 from error import DeptNotFoundError
@@ -91,7 +91,7 @@ def update_dept(req, db, context, dept_id):
         raise DeptNotFoundError(dept_id)
     dept = result.first()
 
-    if is_dept_admin(context, dept_id) == False:
+    if is_dept_admin_of(context, dept_id) == False:
         raise NotDeptAdminError(dept_id)
 
     if name: 
@@ -123,7 +123,7 @@ def delete_dept(req, db, context, dept_id):
         raise DeptNotFoundError(dept_id)        
     dept = result.first()
 
-    if is_dept_admin(context, dept_id) == False:
+    if is_dept_admin_of(context, dept_id) == False:
         raise NotDeptAdminError(dept_id)
 
     if db.query(User).filter(User.dept_id==dept_id).count() > 0:

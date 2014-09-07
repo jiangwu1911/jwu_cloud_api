@@ -91,6 +91,7 @@ class OpenStackTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
+        print content
         server = json.loads(content)['server']
         
         # Get server status

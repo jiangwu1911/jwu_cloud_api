@@ -153,6 +153,7 @@ class Server(Base, JsonObj):
     flavor = Column(String(200))
     creator = Column(Integer)   # Who created this server
     owner = Column(Integer)     # Currently who own this server
+    dept = Column(Integer)
     name = Column(String(100), nullable=False)
     instance_id = Column(String(100), nullable=False)
     state = Column(String(100))
@@ -171,8 +172,10 @@ class Server(Base, JsonObj):
     updated_at = Column(DateTime)
     deleted_at = Column(DateTime)
     
-    def __init__(self, image='', flavor='', creator=0, owner=0, name='', instance_id='', state='', task_state='',
-                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', console_url='', fault='', deleted=0,
+    def __init__(self, image='', flavor='', creator=0, owner=0, dept=0, 
+                 name='', instance_id='', state='', task_state='',
+                 ram=0, disk=0, ephemeral=0, swap=0, vcpus=0, ip='', 
+                 console_url='', fault='', deleted=0,
                  created_by=0, created_at='0000-00-00 00:00:00', 
                  updated_at='0000-00-00 00:00:00', 
                  deleted_at='0000-00-00 00:00:00'):
@@ -180,6 +183,7 @@ class Server(Base, JsonObj):
         self.flavor = flavor
         self.creator = creator
         self.owner = owner
+        self.dept = dept
         self.name = name
         self.instance_id = instance_id
         self.state = state
@@ -199,11 +203,12 @@ class Server(Base, JsonObj):
         self.deleted_at = deleted_at
 
     def __repr__(self): 
-        return("<Server(%d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
+        return("<Server(%d, %d, %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d, \
                 %d, '%s', '%s', '%s', %d, %d, '%s', '%s', '%s')>"
               % (self.id,
                  self.creator,
                  self.owner,
+                 self.dept,
                  self.image,
                  self.flavor,
                  self.name,

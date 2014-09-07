@@ -11,7 +11,7 @@ listen_port = 8080
 token_expires = 86400
 
 openstack_api = {
-    'keystone_url': 'http://192.168.206.100:5000/v2.0',
+    'keystone_url': 'http://192.168.206.10:5000/v2.0',
     'user': 'user01',
     'password': 'abc123',
     'tenant_name': 'project01',
@@ -22,8 +22,8 @@ openstack_api = {
 }
 
 openstack_message_queue = {
-    'host': '192.168.206.100',
+    'host': '192.168.206.10',
     'port': 5672,
     'nova_user': 'nova',
-    'nova_password': 'segZWlwi',
+    'nova_password': 'hTTCIVbC',
 }

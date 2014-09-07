@@ -77,6 +77,45 @@ class UserTestCase(BaseTestCase):
         self.assertEqual(user['id'], 4, 'test_show_user_with_userid failed')
 
 
+    def test_list_user_normal_user(self):
+        content = self.get_token('用户1', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "users",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        users = json.loads(content)['users']
+        self.assertTrue(len(users)==1, 'test_list_user_normal_user')
+
+
+    def test_show_user_normal_user_not_found(self):
+        content = self.get_token('用户1', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "users/9",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_show_user_normal_user_not_found failed')
+
+
+    def test_show_user_normal_user(self):
+        content = self.get_token('用户1', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "users/8",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        user = json.loads(content)['user']
+        self.assertTrue(user['id']==8, 'test_list_user_normal_user failed')
+
+
     def test_add_user_dup_username(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']

@@ -9,7 +9,8 @@ import bottle
 from common import pre_check
 from common import get_input
 from common import get_required_input
-from common import is_dept_admin
+from common import is_dept_admin_of
+from common import is_sys_admin_or_dept_admin
 from common import get_all_roles
 from common import handle_db_error
 from common import get_all_depts
@@ -37,39 +38,65 @@ def list_user(req, db, context):
     depts = []
     dept_id = get_input(req, 'dept_id')
 
-    if dept_id and dept_id!="":
-        dept_id = int(dept_id)
-        if is_dept_admin(context, dept_id) == False:
-            raise NotDeptAdminError(dept_id)
-        # 如果给出了dept_id, 显示所有该部门和下面子部门的用户
-        for d in get_all_depts(req, db, context, dept_id):
-            depts.append(d.id)
+    if is_sys_admin_or_dept_admin(context):
+        # 如果是管理员，能够列出所管理的所有用户
+        if dept_id and dept_id!="":
+            dept_id = int(dept_id)
+            if is_dept_admin_of(context, dept_id) == False:
+                raise NotDeptAdminError(dept_id)
+            # 如果给出了dept_id, 显示所有该部门和下面子部门的用户
+            for d in get_all_depts(req, db, context, dept_id):
+                depts.append(d.id)
         
-    else:
-        # 如果没给出dept_id, 显示该管理员管理的所有部门的用户
-        depts = context['dept_ids']
+        else:
+            # 如果没给出dept_id, 显示该管理员管理的所有部门的用户
+            depts = context['dept_ids']
 
-    results = db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
-                       .filter(User.dept_id.in_(depts), 
-                               User.deleted==0,
-                               User.id==UserRoleMembership.user_id,
-                               Role.id==UserRoleMembership.role_id).all()
+        results = db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
+                           .filter(User.dept_id.in_(depts), 
+                                User.deleted==0,
+                                User.id==UserRoleMembership.user_id,
+                                Role.id==UserRoleMembership.role_id).all()
+
+    else :
+        # 普通用户只能列出自己
+        results = db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
+                           .filter(User.id==context['user'].id,
+                                   User.deleted==0,
+                                   User.id==UserRoleMembership.user_id,
+                                   Role.id==UserRoleMembership.role_id).all()
+
     users = []
     for item in results:
         users.append(tuple_to_dict(item, 'id, name, password, email, dept_id, role_id, role_name'))
     return {'users': users}
 
 
+def find_user(db, context, user_id):
+    if is_sys_admin_or_dept_admin(context):
+        # 如果是管理员, 在所管理的部门下面查找用户
+        user = db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
+                        .filter(User.dept_id.in_(context['dept_ids']),
+                                User.id==user_id,
+                                User.deleted==0,
+                                User.id==UserRoleMembership.user_id,
+                                Role.id==UserRoleMembership.role_id).first()
+    else:
+        # 普通用户只能找到自己
+        user =  db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
+                        .filter(User.id==context['user'].id,
+                                User.id==user_id,
+                                User.deleted==0,
+                                User.id==UserRoleMembership.user_id,
+                                Role.id==UserRoleMembership.role_id).first()
+    if user == None:
+        raise UserNotFoundError(user_id)
+    return user
+
+
 @pre_check
 def show_user(req, db, context, user_id):
-    user = db.query(User.id, User.name, User.password, User.email, User.dept_id, Role.id, Role.name)\
-                    .filter(User.dept_id.in_(context['dept_ids']),
-                            User.id==user_id, 
-                            User.deleted==0,
-                            User.id==UserRoleMembership.user_id,
-                            Role.id==UserRoleMembership.role_id).first()
-    if user == None: 
-        raise UserNotFoundError(user_id)
+    user = find_user(db, context, user_id)
     return {'user': tuple_to_dict(user, 'id, name, password, email, dept_id, role_id, role_name')}
 
 
@@ -87,7 +114,7 @@ def create_user(req, db, context):
     if db.query(User).filter(User.email==email, User.deleted==0).count() > 0:
         raise EmailAlreadyExistError(email)
 
-    if is_dept_admin(context, dept_id) == False:
+    if is_dept_admin_of(context, dept_id) == False:
         raise NotDeptAdminError(dept_id)
 
     if role_id == None:
@@ -152,7 +179,7 @@ def update_user(req, db, context, user_id):
         if user.name=='admin' and user.dept_id!=dept_id:
             raise CannotModifyAdminError
 
-        if is_dept_admin(context, dept_id) == False:
+        if is_dept_admin_of(context, dept_id) == False:
             raise NotDeptAdminError(dept_id)
         user.dept_id = dept_id
 

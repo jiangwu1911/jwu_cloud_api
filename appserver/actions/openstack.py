@@ -11,6 +11,8 @@ from common import get_input
 from common import get_required_input
 from common import handle_db_error
 from common import write_operation_log
+from common import is_sys_admin_or_dept_admin
+from user import find_user
 from error import CannotConnectToOpenStackError
 from error import FlavorNotFoundError
 from error import ImageNotFoundError
@@ -146,9 +148,14 @@ def list_image(req, db, context):
 @pre_check
 @openstack_call
 def list_server(req, db, context):
-    servers = db.query(Server).filter(or_(Server.owner==context['user'].id,
-                                          Server.creator==context['user'].id),
-                                      Server.deleted==0).all()
+    if is_sys_admin_or_dept_admin(context):
+        # 管理员可以看到部门下面所有机器
+        servers = db.query(Server).filter(Server.dept.in_(context['dept_ids']),
+                                          Server.deleted==0).all()
+    else:
+        # 普通用户只能看到属于自己的机器
+        servers = db.query(Server).filter(Server.owner==context['user'].id,
+                                          Server.deleted==0).all()
     return obj_array_to_json(servers, 'servers')
 
 
@@ -189,6 +196,7 @@ def create_server(req, db, context):
     instance = nova_client.servers.get(instance).to_dict()
     server = Server(creator = context['user'].id,
                     owner = None,  
+                    dept = context['user'].dept_id, # 部门设置成创建者所属的部门
                     name = server_name,
                     image = image_name,
                     flavor = flavor_name,
@@ -265,9 +273,11 @@ def update_server(req, db, context, server_id):
     if name:
         server.name = name
     
-    owner = get_input(req, 'owner')
-    if owner:
-        server.owner = owner
+    owner_id = get_input(req, 'owner')
+    if owner_id:
+        owner = find_user(db, context, owner_id)
+        server.owner = owner_id
+        server.dept = owner.dept_id
 
     db.add(server)
     db.commit()
