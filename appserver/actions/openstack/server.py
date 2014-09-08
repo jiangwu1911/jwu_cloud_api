@@ -29,7 +29,7 @@ log = logging.getLogger("cloudapi")
 @pre_check
 @openstack_call
 def list_flavor(req, db, context):
-    objs = nova_client.flavors.list()
+    objs = nova_client().flavors.list()
 
     flavors = []
     for o in objs:
@@ -52,7 +52,7 @@ def create_flavor(req, db, context):
     ephemeral = get_input(req, 'ephemeral') 
     swap = get_input(req, 'swap')
 
-    flavor = admin_nova_client.flavors.create(name, ram, vcpus, disk,
+    flavor = admin_nova_client().flavors.create(name, ram, vcpus, disk,
                                               flavorid='auto', 
                                               ephemeral=ephemeral,
                                               swap=swap,
@@ -63,7 +63,7 @@ def create_flavor(req, db, context):
 @pre_check
 @openstack_call
 def delete_flavor(req, db, context, flavor_id):
-    admin_nova_client.flavors.delete(flavor_id)
+    admin_nova_client().flavors.delete(flavor_id)
 
 
 @pre_check
@@ -76,7 +76,7 @@ def update_flavor(req, db, context, flavor_id):
     ephemeral = get_input(req, 'ephemeral')
     swap = get_input(req, 'swap')
 
-    f = nova_client.flavors.get(flavor_id)
+    f = nova_client().flavors.get(flavor_id)
 
     if name==None or name=='':
         name = f.name
@@ -93,9 +93,9 @@ def update_flavor(req, db, context, flavor_id):
         if swap == '':
             swap = 0
 
-    admin_nova_client.flavors.delete(flavor_id)
+    admin_nova_client().flavors.delete(flavor_id)
         
-    flavor = admin_nova_client.flavors.create(name, int(ram), int(vcpus), int(disk),
+    flavor = admin_nova_client().flavors.create(name, int(ram), int(vcpus), int(disk),
                                               flavorid=flavor_id,
                                               ephemeral=int(ephemeral),
                                               swap=int(swap),
@@ -108,7 +108,7 @@ def update_flavor(req, db, context, flavor_id):
 @pre_check
 @openstack_call
 def list_image(req, db, context):
-    objs = nova_client.images.list()
+    objs = nova_client().images.list()
     return {'images': [o.to_dict() for o in objs if o]}
 
 
@@ -160,21 +160,21 @@ def create_server(req, db, context):
     server_name = get_required_input(req, 'server_name')
     
     try:
-        flavor = nova_client.flavors.find(name=flavor_name)
+        flavor = nova_client().flavors.find(name=flavor_name)
     except nv_ex.NotFound, e:
         raise FlavorNotFoundError(flavor_name)
 
     try:
-        image = nova_client.images.find(name=image_name)
+        image = nova_client().images.find(name=image_name)
     except nv_ex.NotFound, e:
         raise ImageNotFoundError(image_name)
 
-    instance = nova_client.servers.create(name=server_name,
+    instance = nova_client().servers.create(name=server_name,
                                           image=image,
                                           flavor=flavor)
     
     flavor = flavor.to_dict()
-    instance = nova_client.servers.get(instance).to_dict()
+    instance = nova_client().servers.get(instance).to_dict()
     server = Server(creator = context['user'].id,
                     dept = context['user'].dept_id, # 部门设置成创建者所属的部门
                     name = server_name,
@@ -210,7 +210,7 @@ def create_server(req, db, context):
 def delete_server(req, db, context, server_id):
     server = find_server(db, context, server_id);
     try:
-        nova_client.servers.delete(server.instance_id)
+        nova_client().servers.delete(server.instance_id)
     except nv_ex.NotFound, e:
         # server在openstack中已被删除
         server.deleted = 1
@@ -264,19 +264,19 @@ def update_server(req, db, context, server_id):
 
 
 def start_server(server):
-    nova_client.servers.start(server.instance_id) 
+    nova_client().servers.start(server.instance_id) 
 
 
 def stop_server(server):
-    nova_client.servers.stop(server.instance_id)
+    nova_client().servers.stop(server.instance_id)
 
 
 def suspend_server(server):
-    nova_client.servers.suspend(server.instance_id) 
+    nova_client().servers.suspend(server.instance_id) 
 
 
 def resume_server(server):
-    nova_client.servers.resume(server.instance_id)
+    nova_client().servers.resume(server.instance_id)
 
 
 def get_console(req, db, server):
@@ -284,7 +284,7 @@ def get_console(req, db, server):
     if console_type==None or console_type=='':
         console_type = 'novnc'
 
-    ret = nova_client.servers.get_vnc_console(server.instance_id,
+    ret = nova_client().servers.get_vnc_console(server.instance_id,
                                               console_type)
     server.console_url = ret['console']['url']
     db.add(server)
@@ -294,7 +294,7 @@ def get_console(req, db, server):
 
 def take_snapshot(req, db, context, server):
     name = get_required_input(req, 'snapshot_name');
-    snapshot_id = nova_client.servers.create_image(server.instance_id, name)
+    snapshot_id = nova_client().servers.create_image(server.instance_id, name)
 
     snapshot = Snapshot(creator = context['user'].id,
                         dept = server.dept,

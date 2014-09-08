@@ -69,7 +69,7 @@ def create_volume(req, db, context):
     size = get_required_input(req, 'size')
 
     data = {'display_name': name}
-    ret = cinder_client.volumes.create(size, **data)
+    ret = cinder_client().volumes.create(size, **data)
 
     volume = Volume(creator = context['user'].id,
                     dept = context['user'].dept_id, # 部门设置成创建者所属的部门
@@ -97,7 +97,7 @@ def create_volume(req, db, context):
 def delete_volume(req, db, context, id):
     volume = find_volume(db, context, id)
     try:
-        cinder_client.volumes.delete(volume.volume_id)
+        cinder_client().volumes.delete(volume.volume_id)
     except ci_ex.NotFound, e:
         # volume在openstack中已被删除
         volume.deleted = 1
@@ -148,7 +148,7 @@ def attach(req, db, context, volume):
     device = get_input(req, 'device')
     server = find_server(db, context, server_id)
 
-    nova_client.volumes.create_server_volume(server.instance_id,
+    nova_client().volumes.create_server_volume(server.instance_id,
                                              volume.volume_id,
                                              device)
     volume.status = 'attaching'
@@ -158,7 +158,7 @@ def attach(req, db, context, volume):
 
 def detach(req, db, context, volume):
     server = find_server(db, context, volume.attached_to)
-    nova_client.volumes.delete_server_volume(server.instance_id,
+    nova_client().volumes.delete_server_volume(server.instance_id,
                                              volume.volume_id)
     volume.status = 'detaching'
     db.add(volume)

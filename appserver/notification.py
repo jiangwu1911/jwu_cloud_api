@@ -145,7 +145,7 @@ class CinderWorker(Worker):
 
         payload = body.get('payload')
         event_type = body.get('event_type', '')
-        #log.debug(body)
+        log.debug(body)
         notification = CinderNotification(
                         message_id = body.get('message_id', ''),
                         occurred_at = body.get('timestamp', ''),
@@ -212,7 +212,7 @@ class GlanceWorker(Worker):
 
         payload = body.get('payload')
         event_type = body.get('event_type', '')
-        log.debug(body)
+        #log.debug(body)
 
         notification = GlanceNotification(
                         message_id = body.get('message_id', ''),

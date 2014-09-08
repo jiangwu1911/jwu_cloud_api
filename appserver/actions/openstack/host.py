@@ -21,7 +21,7 @@ def list_hypervisor(req, db, context):
     if action == 'stats':
         return hopervisor_stats(db, context)
     else:
-        results = admin_nova_client.hypervisors.list()
+        results = admin_nova_client().hypervisors.list()
         return obj_array_to_json(results, 'hypervisors')
 
 
@@ -30,7 +30,7 @@ def hopervisor_stats(db, context):
     # disk: local_gb, local_gb_used, disk_available_least, free_disk_gb
     # ram:  free_disk_gb, free_disk_gb, free_disk_gb
     # vcpus: vcpus, vcpus_used
-    result = admin_nova_client.hypervisors.statistics()
+    result = admin_nova_client().hypervisors.statistics()
 
     free_vcpus = result.vcpus - result.vcpus_used
     if free_vcpus < 0:
