@@ -8,13 +8,16 @@ from kombu import Connection
 from kombu import Exchange, Queue
 from model import NovaNotification
 from model import CinderNotification
+from model import GlanceNotification
 from model import Server
 from model import Volume
+from model import Snapshot
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 import settings as conf
 import novaclient.v1_1.client as nvclient
 import cinderclient.v1.client as ciclient
+import glanceclient as glclient
 
 
 log = logging.getLogger("cloudapi")
@@ -54,7 +57,7 @@ class NovaWorker(Worker):
         # Save notification in database
         payload = body.get('payload')
         event_type = body.get('event_type', '')
-        log.debug(body);
+        #log.debug(body);
         notification = NovaNotification(
                         message_id = body.get('message_id', ''),
                         occurred_at = body.get('timestamp', ''),
@@ -189,7 +192,50 @@ class CinderWorker(Worker):
 
             db.add(volume)
             db.commit()
-        
+
+
+class GlanceWorker(Worker):
+    def get_consumers(self, Consumer, channel):
+        exchange = Exchange('openstack', type='topic', durable=False,
+                            auto_delete=False, internal=False)
+        queues = [Queue('cloudapi_glance', exchange,
+                        routing_key='notifications.info',
+                        no_ack=True)]
+        return [Consumer(queues=queues,
+                         accept=['json'],
+                         callbacks=[self.process_task])]
+
+
+    def process_task(self, body, message):
+        Session = sessionmaker(self.db_engine)
+        db = Session()
+
+        payload = body.get('payload')
+        event_type = body.get('event_type', '')
+        log.debug(body)
+
+        notification = GlanceNotification(
+                        message_id = body.get('message_id', ''),
+                        occurred_at = body.get('timestamp', ''),
+                        event_type = event_type,
+                        snapshot_id = payload.get('id', ''),
+                        status = payload.get('status', ''))
+        db.add(notification)
+        db.commit()
+
+        self.update_snapshot_status(db, notification, payload)
+        db.close
+
+
+    def update_snapshot_status(self, db, notification, payload):
+        snapshot = db.query(Snapshot).filter(Snapshot.snapshot_id==notification.snapshot_id).first()
+        if snapshot:
+            snapshot.status = notification.status
+            snapshot.size = payload.get('size', 0)
+            snapshot.updated_at = datetime.datetime.now()
+            db.add(snapshot)
+            db.commit()
+   
 
 class NotifyListener(threading.Thread):
     def __init__(self, db_engine):
@@ -223,6 +269,21 @@ class CinderNotifyListener(NotifyListener):
         with Connection(url) as conn:
             try:
                 worker = CinderWorker(conn, self.db_engine)
+                worker.run()
+            except KeyboardInterrupt:
+                pass
+
+
+class GlanceNotifyListener(NotifyListener):
+    def run(self):
+        mq = conf.openstack_message_queue
+        url = "amqp://%s:%s@%s:%d//" % (mq['nova_user'],
+                                        mq['nova_password'],
+                                        mq['host'],
+                                        mq['port'])
+        with Connection(url) as conn:
+            try:
+                worker = GlanceWorker(conn, self.db_engine)
                 worker.run()
             except KeyboardInterrupt:
                 pass

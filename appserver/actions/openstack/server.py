@@ -300,6 +300,7 @@ def take_snapshot(req, db, context, server):
                         dept = server.dept,
                         owner = server.owner,
                         name = name,
+                        status = 'creating',
                         snapshot_id = snapshot_id,
                         created_at = datetime.datetime.now())
     db.add(snapshot)

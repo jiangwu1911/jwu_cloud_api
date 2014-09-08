@@ -194,3 +194,8 @@ class VolumeNotFoundError(HTTPError):
         super(VolumeNotFoundError, self).__init__(404, msg)
 
 
+#----- OpenStack volume related -----
+class SnapshotNotFoundError(HTTPError):
+    def __init__(self, snapshot):
+        msg = "快照不存在。"
+        super(SnapshotNotFoundError, self).__init__(404, msg)

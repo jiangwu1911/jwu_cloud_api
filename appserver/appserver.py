@@ -17,7 +17,7 @@ import urls
 import data
 from notification import NovaNotifyListener
 from notification import CinderNotifyListener
-
+from notification import GlanceNotifyListener
 
 VERSION ="0.1"
 
@@ -69,6 +69,9 @@ def start_notify_listener():
 
     cinder_listener = CinderNotifyListener(engine)
     cinder_listener.start()
+
+    glance_listener = GlanceNotifyListener(engine)
+    glance_listener.start()
 
 
 def init_db(testdata=False):

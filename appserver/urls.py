@@ -7,6 +7,7 @@ from actions import user
 from actions import dept
 from actions.openstack import server
 from actions.openstack import volume
+from actions.openstack import snapshot
 from actions.openstack import host
 import model
 import utils
@@ -158,6 +159,23 @@ def define_route(app):
     def delete_volume(db, volume_id):
         return volume.delete_volume(request, db, volume_id)
 
+
+    #---------- OpenStack Snapshot related ----------
+    @app.get('/snapshots')
+    def list_snapshot(db):
+        return snapshot.list_snapshot(request, db)
+
+    @app.get('/snapshots/:snapshot_id')
+    def show_snapshot(db, snapshot_id):
+        return snapshot.show_snapshot(request, db, snapshot_id)
+
+    @app.post('/snapshots/:snapshot_id')
+    def update_snapshot(db, snapshot_id):
+        return snapshot.update_snapshot(request, db, snapshot_id)
+
+    @app.delete('/snapshots/:snapshot_id')
+    def delete_snapshot(db, snapshot_id):
+        return snapshot.delete_snapshot(request, db, snapshot_id)
 
 
     #----------- OpenStack hypervisor related ----------

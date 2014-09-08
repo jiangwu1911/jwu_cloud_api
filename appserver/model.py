@@ -375,6 +375,33 @@ class CinderNotification(Base, JsonObj):
                 self.occurred_at))
 
 
+class GlanceNotification(Base, JsonObj):
+    __tablename__ = 'glance_notification'
+    id =  Column(Integer, Sequence('seq_pk'), primary_key=True)
+    message_id = Column(String(100), unique=True)
+    event_type = Column(String(100))
+    snapshot_id = Column(String(100))
+    status = Column(String(100))
+    occurred_at = Column(DateTime)
+
+    def __init__(self, message_id='', event_type='', snapshot_id='', status='',
+                 occurred_at='0000-00-00 00:00:00'):
+        self.message_id = message_id
+        self.event_type = event_type
+        self.snapshot_id = snapshot_id
+        self.status = status
+        self.occurred_at = occurred_at
+
+    def __repr__(self):
+        return("<GlanceNotification(%d, '%s', '%s', '%s', '%s', '%s')>"
+             % (self.id,
+                self.message_id,
+                self.event_type,
+                self.snapshot_id,
+                self.status,
+                self.occurred_at))
+
+
 class Snapshot(Base, JsonObj):
     """Snapshot in OpenStack"""
     __tablename__ = 'snapshot'
