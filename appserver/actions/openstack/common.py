@@ -17,21 +17,18 @@ log = logging.getLogger("cloudapi")
 nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
                               username = conf.openstack_api['user'],
                               api_key = conf.openstack_api['password'],
-                              project_id = conf.openstack_api['tenant_name']
-                             )
+                              project_id = conf.openstack_api['tenant_name'])
 
 # 某些操作, 比如创建flavor, 只能用admin身份做
 admin_nova_client =  nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
                               username = conf.openstack_api['admin_user'],
                               api_key = conf.openstack_api['admin_password'],
-                              project_id = conf.openstack_api['admin_tenant_name']
-                             )
+                              project_id = conf.openstack_api['admin_tenant_name'])
 
 cinder_client = ciclient.Client(auth_url = conf.openstack_api['keystone_url'],
                                 username = conf.openstack_api['user'],
                                 api_key = conf.openstack_api['password'],
-                                project_id = conf.openstack_api['tenant_name']
-                               )
+                                project_id = conf.openstack_api['tenant_name'])
 
 def openstack_call(func):
     def _deco(*args):

@@ -100,6 +100,7 @@ def delete_volume(req, db, context, id):
         # volume在openstack中已被删除
         volume.deleted = 1
         volume.deleted_at = datetime.datetime.now()
+        volume.status = 'deleting'
         db.add(volume)
         db.commit()
 
@@ -110,3 +111,23 @@ def delete_volume(req, db, context, id):
                         resource_uuid = volume.volume_id,
                         event = 'delete volume')
     db.commit()
+
+
+@pre_check
+@openstack_call
+def update_volume(req, db, context, id):
+    volume = find_volume(db, context, id);
+
+    name = get_input(req, 'name')
+    if name:
+        volume.name = name
+
+    owner_id = get_input(req, 'owner')
+    if owner_id:
+        owner = find_user(db, context, owner_id)
+        volume.owner = owner_id
+        volume.dept = owner.dept_id
+
+    db.add(volume)
+    db.commit()
+

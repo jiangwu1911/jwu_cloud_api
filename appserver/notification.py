@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import logging
 import threading
 import datetime
@@ -12,8 +14,20 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 import settings as conf
 import novaclient.v1_1.client as nvclient
+import cinderclient.v1.client as ciclient
+
 
 log = logging.getLogger("cloudapi")
+
+nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
+                              username = conf.openstack_api['user'],
+                              api_key = conf.openstack_api['password'],
+                              project_id = conf.openstack_api['tenant_name'])
+
+cinder_client = ciclient.Client(auth_url = conf.openstack_api['keystone_url'],
+                                username = conf.openstack_api['user'],
+                                api_key = conf.openstack_api['password'],
+                                project_id = conf.openstack_api['tenant_name'])
 
 class Worker(ConsumerMixin):
     def __init__(self, connection, db_engine):
@@ -76,10 +90,6 @@ class NovaWorker(Worker):
             db.add(server)
             db.commit()
 
-            nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
-                                          username = conf.openstack_api['user'],
-                                          api_key = conf.openstack_api['password'],
-                                          project_id = conf.openstack_api['tenant_name'])
             try:
                 instance = nova_client.servers.get(notification.instance_id).to_dict()
                 if notification.state == 'active':
@@ -155,7 +165,28 @@ class CinderWorker(Worker):
             if notification.event_type == 'volume.delete.end':
                 volume.deleted = 1
                 volume.deleted_at = datetime.datetime.now()
-            
+
+            if notification.event_type == 'volume.attach.end':
+                attached_instance_id = ''
+                try:
+                    # notification中不包含attachments信息, 要重新从cinder取
+                    ret = cinder_client.volumes.get(volume.volume_id)
+                    if ret.attachments:
+                        for att in ret.attachments:
+                            if att['volume_id'] == volume.volume_id:
+                                attached_instance_id = att['server_id']
+                except Exception, e:
+                    log.info(e)
+
+                if attached_instance_id:
+                    server = db.query(Server).filter(Server.instance_id==attached_instance_id).first()
+                    if server:
+                        volume.attached_to = server.id
+
+            if notification.event_type == 'volume.detach.end': 
+                if notification.status == 'available':
+                    volume.attached_to = ''
+
             db.add(volume)
             db.commit()
         

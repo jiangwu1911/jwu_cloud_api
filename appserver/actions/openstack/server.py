@@ -20,6 +20,8 @@ from error import UnsupportedOperationError
 from model import Server
 
 from actions.openstack.common import *
+from actions.openstack.volume import find_volume
+
 
 log = logging.getLogger("cloudapi")
 
@@ -255,6 +257,10 @@ def update_server(req, db, context, server_id):
             return resume_server(server)
         elif action == 'get_console':
             return get_console(req, db, server)
+        elif action == 'attach_volume':
+            return attach_volume(req, db, context, server)
+        elif action == 'detach_volume':
+            return detach_volume(req, db, context, server)
         else:
             raise UnsupportedOperationError(action)
 
@@ -286,3 +292,29 @@ def get_console(req, db, server):
     db.add(server)
     db.commit()
     return ret
+
+
+def attach_volume(req, db, context, server):
+    volume_id = get_required_input(req, 'volume_id') 
+    device = get_input(req, 'device')
+    volume = find_volume(db, context, volume_id)
+
+    nova_client.volumes.create_server_volume(server.instance_id,
+                                             volume.volume_id,
+                                             device)
+
+    volume.status = 'attaching'
+    db.add(volume)
+    db.commit()
+
+
+def detach_volume(req, db, context, server):
+    volume_id = get_required_input(req, 'volume_id')
+    volume = find_volume(db, context, volume_id)
+
+    nova_client.volumes.delete_server_volume(server.instance_id,
+                                             volume.volume_id)
+    volume.status = 'detaching'
+    db.add(volume)
+    db.commit()
+    

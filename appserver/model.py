@@ -239,6 +239,7 @@ class Volume(Base, JsonObj):
     volume_id = Column(String(100), nullable=False)
     status = Column(String(100))
     size = Column(Integer)
+    attached_to = Column(String(100))
     fault = Column(String(500))
     deleted = Column(Integer)
     created_at = Column(DateTime)
@@ -246,7 +247,7 @@ class Volume(Base, JsonObj):
     deleted_at = Column(DateTime)
 
     def __init__(self, creator='', owner=0, dept=0, name='', volume_id='',
-                 status='', size=0, fault='', deleted=0,
+                 status='', size=0, attached_to='', fault='', deleted=0,
                  created_at='0000-00-00 00:00:00', 
                  updated_at='0000-00-00 00:00:00',
                  deleted_at='0000-00-00 00:00:00'):
@@ -257,6 +258,7 @@ class Volume(Base, JsonObj):
         self.volume_id = volume_id
         self.status = status
         self.size = size
+        self.attached_to = attached_to
         self.fault = fault
         self.deleted = deleted
         self.created_at = created_at
@@ -264,7 +266,7 @@ class Volume(Base, JsonObj):
         self.deleted_at = deleted_at
 
     def __repr__(self):
-        return("<Volume(%d, %d, %d, '%s', '%s', '%s', %d, '%s', %d, '%s', '%s', '%s')>"
+        return("<Volume(%d, %d, %d, '%s', '%s', '%s', %d, '%s', %d, '%s', '%s', '%s', '%s')>"
              % (self.creator,
                 self.owner,
                 self.dept,
@@ -272,6 +274,7 @@ class Volume(Base, JsonObj):
                 self.volume_id,
                 self.status,
                 self.size,
+                self.attached_to,
                 self.fault,
                 self.deleted,
                 self.created_at,
