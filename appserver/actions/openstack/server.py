@@ -123,10 +123,6 @@ def list_server(req, db, context):
         # 普通用户只能看到属于自己的机器
         servers = db.query(Server).filter(Server.owner==context['user'].id,
                                           Server.deleted==0).all()
-
-    for s in servers:
-        if s.owner == 0:
-            s.owner = ''
     return obj_array_to_json(servers, 'servers')
 
 
@@ -144,8 +140,6 @@ def find_server(db, context, server_id):
     if server == None:
         raise ServerNotFoundError
 
-    if server.owner == 0:
-        server.owner = ''
     return server
 
 
@@ -165,12 +159,12 @@ def create_server(req, db, context):
     
     try:
         flavor = nova_client.flavors.find(name=flavor_name)
-    except exceptions.NotFound, e:
+    except nv_ex.NotFound, e:
         raise FlavorNotFoundError(flavor_name)
 
     try:
         image = nova_client.images.find(name=image_name)
-    except exceptions.NotFound, e:
+    except nv_ex.NotFound, e:
         raise ImageNotFoundError(image_name)
 
     instance = nova_client.servers.create(name=server_name,
@@ -215,7 +209,7 @@ def delete_server(req, db, context, server_id):
     server = find_server(db, context, server_id);
     try:
         nova_client.servers.delete(server.instance_id)
-    except exceptions.NotFound, e:
+    except nv_ex.NotFound, e:
         # server在openstack中已被删除
         server.deleted = 1
         server.deleted_at = datetime.datetime.now()

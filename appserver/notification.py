@@ -5,7 +5,9 @@ from kombu.mixins import ConsumerMixin
 from kombu import Connection
 from kombu import Exchange, Queue
 from model import NovaNotification
+from model import CinderNotification
 from model import Server
+from model import Volume
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 import settings as conf
@@ -70,17 +72,16 @@ class NovaWorker(Worker):
             if notification.state=='deleted':
                 server.deleted = 1
                 server.deleted_at = datetime.datetime.now()
+
             db.add(server)
             db.commit()
 
             nova_client = nvclient.Client(auth_url = conf.openstack_api['keystone_url'],
                                           username = conf.openstack_api['user'],
                                           api_key = conf.openstack_api['password'],
-                                          project_id = conf.openstack_api['tenant_name']
-                                             )
+                                          project_id = conf.openstack_api['tenant_name'])
             try:
                 instance = nova_client.servers.get(notification.instance_id).to_dict()
-
                 if notification.state == 'active':
                     # Get server's IP
                     ips = []
@@ -126,9 +127,38 @@ class CinderWorker(Worker):
                          callbacks=[self.process_task])]
 
     def process_task(self, body, message):
+        Session = sessionmaker(self.db_engine)
+        db = Session()
+
+        payload = body.get('payload')
         event_type = body.get('event_type', '')
-        log.debug(body)
- 
+        #log.debug(body)
+        notification = CinderNotification(
+                        message_id = body.get('message_id', ''),
+                        occurred_at = body.get('timestamp', ''),
+                        event_type = event_type,
+                        volume_id = payload.get('volume_id', ''),
+                        status = payload.get('status', ''))
+        db.add(notification)
+        db.commit()
+
+        self.update_volume_status(db, notification)
+        db.close()
+
+    
+    def update_volume_status(self, db, notification):
+        volume = db.query(Volume).filter(Volume.volume_id==notification.volume_id).first()
+        if volume:
+            volume.status = notification.status
+            volume.updated_at = datetime.datetime.now()
+             
+            if notification.event_type == 'volume.delete.end':
+                volume.deleted = 1
+                volume.deleted_at = datetime.datetime.now()
+            
+            db.add(volume)
+            db.commit()
+        
 
 class NotifyListener(threading.Thread):
     def __init__(self, db_engine):

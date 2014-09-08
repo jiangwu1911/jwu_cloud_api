@@ -35,6 +35,19 @@ class OpenStackVolumeTestCase(BaseTestCase):
         self.assertEqual(error['code'], "404", 'test_show_volume_not_found failed')
 
 
+    def test_delete_volume_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "volumes/100",
+                                  "DELETE",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "404", 'test_delete_volume_not_found failed')
+
+
     def test_create_volume(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
@@ -46,9 +59,18 @@ class OpenStackVolumeTestCase(BaseTestCase):
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
+        print content
         volume = json.loads(content)['volume']
         self.assertTrue(volume['id']>0, 'test_list_flavor failed')
+        return
 
+        time.sleep(10)
+        resp, content = h.request(self.base_url + "volumes/%d" % volume['id'],
+                                  "DELETE",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        print content
 
 
 if __name__ == "__main__":

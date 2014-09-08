@@ -33,9 +33,6 @@ def list_volume(req, db, context):
         # 普通用户只能看到属于自己的云硬盘
         volumes = db.query(Volume).filter(Volume.owner==context['user'].id,
                                           Volume.deleted==0).all()
-    for s in volumes:
-        if s.owner == 0:
-            s.owner = ''
     return obj_array_to_json(volumes, 'volumes')
 
 
@@ -53,8 +50,6 @@ def find_volume(db, context, volume_id):
     if volume == None:
         raise VolumeNotFoundError(volume_id)
 
-    if volume.owner == 0:
-        volume.owner = ''
     return volume
 
 
@@ -93,3 +88,25 @@ def create_volume(req, db, context):
     db.commit()
     log.debug(volume)
     return obj_to_json(volume, 'volume')
+
+
+@pre_check
+@openstack_call
+def delete_volume(req, db, context, id):
+    volume = find_volume(db, context, id)
+    try:
+        cinder_client.volumes.delete(volume.volume_id)
+    except ci_ex.NotFound, e:
+        # volume在openstack中已被删除
+        volume.deleted = 1
+        volume.deleted_at = datetime.datetime.now()
+        db.add(volume)
+        db.commit()
+
+    write_operation_log(db,
+                        user_id = context['user'].id,
+                        resource_type = 'volume',
+                        resource_id = volume.id,
+                        resource_uuid = volume.volume_id,
+                        event = 'delete volume')
+    db.commit()
