@@ -16,7 +16,7 @@ class OpenStackServerTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         data = {'action': 'get_console', 'console_type': 'novnc'}
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "servers/2",
+        resp, content = h.request(self.base_url + "servers/1",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -31,7 +31,7 @@ class OpenStackServerTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         data = {'name': 'myserver'}
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "servers/1",
+        resp, content = h.request(self.base_url + "servers/100",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -46,7 +46,7 @@ class OpenStackServerTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         data = {'owner': '1', 'name': 'myserver'}
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "servers/2",
+        resp, content = h.request(self.base_url + "servers/1",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -61,12 +61,26 @@ class OpenStackServerTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         data = {'owner': '4', 'name': "zhangsan's server"}
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "servers/2",
+        resp, content = h.request(self.base_url + "servers/1",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
+
+
+    def test_server_take_snapshot(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        data = {'action': 'take_snapshot', 'snapshot_name': 'test_snapshot_11'}
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "servers/1",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        print content
 
 
 if __name__ == "__main__":

@@ -373,3 +373,58 @@ class CinderNotification(Base, JsonObj):
                 self.volume_id,
                 self.status,
                 self.occurred_at))
+
+
+class Snapshot(Base, JsonObj):
+    """Snapshot in OpenStack"""
+    __tablename__ = 'snapshot'
+    id =  Column(Integer, Sequence('seq_pk'), primary_key=True)
+    creator = Column(Integer)   # Who created this volume
+    owner = Column(Integer)     # Currently who own this volume
+    dept = Column(Integer)
+    name = Column(String(100), nullable=False)
+    snapshot_id = Column(String(100), nullable=False)
+    server_id = Column(Integer)
+    status = Column(String(100))
+    size = Column(Integer)
+    fault = Column(String(500))
+    deleted = Column(Integer)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    deleted_at = Column(DateTime)
+
+    def __init__(self, creator=0, owner=0, dept=0, name='', snapshot_id='', server_id=0, status='',
+                 size=0, fault='', deleted=0, 
+                 created_at='0000-00-00 00:00:00',
+                 updated_at='0000-00-00 00:00:00',
+                 deleted_at='0000-00-00 00:00:00'):
+        self.creator = creator
+        self.owner = owner
+        self.dept = dept
+        self.name = name
+        self.snapshot_id = snapshot_id
+        self.server_id = server_id
+        self.status = status
+        self.size = size
+        self.fault = fault
+        self.deleted = deleted
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.deleted_at = deleted_at
+
+    def __repr__(self):
+        return("<Snapshot(%d, %d, %d, %d, '%s', '%s', %d, '%s', %d, '%s', %d, '%s', '%s', '%s')>" 
+             % (self.id,
+                self.creator,
+                self.owner,
+                self.dept,
+                self.name,
+                self.snapshot_id,
+                self.server_id,
+                self.status,
+                self.size,
+                self.fault,
+                self.deleted,
+                self.created_at,
+                self.updated_at,
+                self.deleted_at))

@@ -18,6 +18,7 @@ from error import FlavorNotFoundError
 from error import ImageNotFoundError
 from error import UnsupportedOperationError
 from model import Server
+from model import Snapshot
 
 from actions.openstack.common import *
 
@@ -256,6 +257,8 @@ def update_server(req, db, context, server_id):
             return resume_server(server)
         elif action == 'get_console':
             return get_console(req, db, server)
+        elif action == 'take_snapshot':
+            return take_snapshot(req, db, context, server)
         else:
             raise UnsupportedOperationError(action)
 
@@ -287,3 +290,19 @@ def get_console(req, db, server):
     db.add(server)
     db.commit()
     return ret
+
+
+def take_snapshot(req, db, context, server):
+    name = get_required_input(req, 'snapshot_name');
+    snapshot_id = nova_client.servers.create_image(server.instance_id, name)
+
+    snapshot = Snapshot(creator = context['user'].id,
+                        dept = server.dept,
+                        owner = server.owner,
+                        name = name,
+                        snapshot_id = snapshot_id,
+                        created_at = datetime.datetime.now())
+    db.add(snapshot)
+    db.commit()
+    log.debug(snapshot)
+    return obj_to_json(snapshot, 'snapshot') 

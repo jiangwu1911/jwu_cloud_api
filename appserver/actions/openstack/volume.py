@@ -71,7 +71,7 @@ def create_volume(req, db, context):
     data = {'display_name': name}
     ret = cinder_client.volumes.create(size, **data)
 
-    volume = Volume(creator =  context['user'].id,
+    volume = Volume(creator = context['user'].id,
                     dept = context['user'].dept_id, # 部门设置成创建者所属的部门
                     name = name,
                     volume_id = ret.id,
