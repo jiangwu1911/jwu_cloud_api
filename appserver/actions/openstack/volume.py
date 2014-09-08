@@ -16,8 +16,10 @@ from utils import obj_array_to_json
 from utils import obj_to_json
 from model import Volume
 from error import VolumeNotFoundError
+from error import UnsupportedOperationError
 
 from actions.openstack.common import *
+from actions.openstack.server import find_server
 
 log = logging.getLogger("cloudapi")
 
@@ -131,3 +133,33 @@ def update_volume(req, db, context, id):
     db.add(volume)
     db.commit()
 
+    action = get_input(req, 'action')
+    if action:
+        if action == 'attach':
+            return attach(req, db, context, volume)
+        elif action == 'detach':
+            return detach(req, db, context, volume)
+        else:
+            raise UnsupportedOperationError(action)
+
+
+def attach(req, db, context, volume):
+    server_id = get_required_input(req, 'server_id')
+    device = get_input(req, 'device')
+    server = find_server(db, context, server_id)
+
+    nova_client.volumes.create_server_volume(server.instance_id,
+                                             volume.volume_id,
+                                             device)
+    volume.status = 'attaching'
+    db.add(volume)
+    db.commit()
+
+
+def detach(req, db, context, volume):
+    server = find_server(db, context, volume.attached_to)
+    nova_client.volumes.delete_server_volume(server.instance_id,
+                                             volume.volume_id)
+    volume.status = 'detaching'
+    db.add(volume)
+    db.commit()

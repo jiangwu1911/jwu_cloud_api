@@ -48,12 +48,28 @@ class OpenStackVolumeTestCase(BaseTestCase):
         self.assertEqual(error['code'], "404", 'test_delete_volume_not_found failed')
 
 
-    def test_attach_server_not_found(self):
+    def atest_attach_operation_not_support(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         data = {'action': 'attach_volume', 'volume_id': 1}
-        resp, content = h.request(self.base_url + "servers/100",
+        resp, content = h.request(self.base_url + "volumes/3",
+                                  "POST",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        print content
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "400", 'test_attach_operation_not_support failed')
+
+
+    def test_attach_server_not_found(self):
+        content = self.get_token('熊大', 'abc123')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        data = {'action': 'attach', 'server_id': 100}
+        resp, content = h.request(self.base_url + "volumes/3",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -63,27 +79,27 @@ class OpenStackVolumeTestCase(BaseTestCase):
         self.assertEqual(error['code'], "404", 'test_attach_server_not_found failed')
 
 
-    def test_attach_volume_not_give(self):
+    def test_attach_server_not_give(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'action': 'attach_volume'}
-        resp, content = h.request(self.base_url + "servers/1",
+        data = {'action': 'attach'}
+        resp, content = h.request(self.base_url + "volumes/3",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )
         error = json.loads(content)['error']
-        self.assertEqual(error['code'], "400", 'test_attach_volume_not_give failed')
+        self.assertEqual(error['code'], "400", 'test_attach_server_not_give failed')
 
 
     def test_attach_volume_not_found(self):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'action': 'attach_volume', 'volume_id': 100}
-        resp, content = h.request(self.base_url + "servers/1",
+        data = {'action': 'attach', 'server_id': 1}
+        resp, content = h.request(self.base_url + "volumes/100",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -97,8 +113,8 @@ class OpenStackVolumeTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        data = {'action': 'attach_volume', 'volume_id': 2}
-        resp, content = h.request(self.base_url + "servers/1",
+        data = {'action': 'attach', 'server_id': 1}
+        resp, content = h.request(self.base_url + "volumes/3",
                                   "POST",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
