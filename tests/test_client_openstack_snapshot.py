@@ -66,7 +66,7 @@ class OpenStackSnapshotTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "snapshots/3",
+        resp, content = h.request(self.base_url + "snapshots/9",
                                   "DELETE",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}

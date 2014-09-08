@@ -152,6 +152,7 @@ def attach(req, db, context, volume):
                                              volume.volume_id,
                                              device)
     volume.status = 'attaching'
+    volume.owner = server.owner
     db.add(volume)
     db.commit()
 

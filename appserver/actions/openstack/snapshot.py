@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
 import traceback
-import novaclient.v1_1.client as nvclient
 import datetime
 
 import logging
@@ -17,9 +16,7 @@ from utils import obj_to_json
 from model import Snapshot
 from error import SnapshotNotFoundError
 from error import UnsupportedOperationError
-
 from actions.openstack.common import *
-from actions.openstack.server import find_server
 
 log = logging.getLogger("cloudapi")
 
@@ -66,6 +63,13 @@ def show_snapshot(req, db, context, snapshot_id):
 @openstack_call
 def delete_snapshot(req, db, context, id):
     snapshot = find_snapshot(db, context, id)
+    try:
+        glance_client().images.delete(snapshot.snapshot_id)
+    except gl_ex.NotFound: 
+        snapshot.deleted = 1
+        snapshot.deleted_at = datetime.datetime.now()
+        db.add(snapshot)
+        db.commit()
 
     write_operation_log(db,
                         user_id = context['user'].id,

@@ -145,7 +145,7 @@ class CinderWorker(Worker):
 
         payload = body.get('payload')
         event_type = body.get('event_type', '')
-        log.debug(body)
+        #log.debug(body)
         notification = CinderNotification(
                         message_id = body.get('message_id', ''),
                         occurred_at = body.get('timestamp', ''),
@@ -212,7 +212,7 @@ class GlanceWorker(Worker):
 
         payload = body.get('payload')
         event_type = body.get('event_type', '')
-        #log.debug(body)
+        log.debug(body)
 
         notification = GlanceNotification(
                         message_id = body.get('message_id', ''),
@@ -233,6 +233,11 @@ class GlanceWorker(Worker):
             snapshot.status = notification.status
             snapshot.size = payload.get('size', 0)
             snapshot.updated_at = datetime.datetime.now()
+
+            if snapshot.status == 'deleted':
+                snapshot.deleted = 1
+                snapshot.deleted_at = datetime.datetime.now()
+
             db.add(snapshot)
             db.commit()
    
