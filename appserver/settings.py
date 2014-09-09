@@ -9,7 +9,8 @@ db_config = {
 listen_ip = "0.0.0.0"
 listen_port = 8080
 token_expires = 86400
-upload_folder = '/tmp/jwu_cloud_api'
+upload_files_path = '/tmp/jwu_cloud_api/'
+static_files_path = '/home/python/jwu_cloud_app/'
 
 openstack_api = {
     'keystone_url': 'http://192.168.206.10:5000/v2.0',

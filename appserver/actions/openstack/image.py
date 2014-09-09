@@ -44,7 +44,7 @@ def show_image(req, db, context, image_id):
 @pre_check
 @openstack_call
 def create_image(req, db, context):
-    folder = conf.upload_folder
+    folder = conf.upload_files_path
     if os.path.exists(folder) == False:
         os.mkdir(folder)
 

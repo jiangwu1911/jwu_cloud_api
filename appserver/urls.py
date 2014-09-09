@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from bottle import route, get, post, delete, request, response, hook
+from bottle import route, get, post, delete, request, response, hook, static_file
 
 from actions import auth
 from actions import user
@@ -12,26 +12,13 @@ from actions.openstack import host
 from actions.openstack import image
 import model
 import utils
+import settings as conf
 
 
 def define_route(app):
-    @app.hook('after_request')
-    def enable_cors():
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS, DELETE'
-        response.headers['Access-Control-Allow-Headers'] = \
-                    'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token, X-Auth-Token'
-
-    @app.route('/:path', method=['OPTIONS'])
-    def options(path):
-        # 允许跨域访问
-        pass
-        
-    @app.route('/:path/:id', method=['OPTIONS'])
-    def options(path, id):
-        # 允许跨域访问
-        pass
-        
+    @app.route('/cloudapp/:path#.+#')
+    def server_static(path):
+        return static_file(path, root=conf.static_files_path)
 
     #---------- auth related ----------
     @app.post('/login')
