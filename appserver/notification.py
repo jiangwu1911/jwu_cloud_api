@@ -12,6 +12,7 @@ from model import GlanceNotification
 from model import Server
 from model import Volume
 from model import Snapshot
+from model import Image
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 import settings as conf
@@ -223,7 +224,9 @@ class GlanceWorker(Worker):
         db.add(notification)
         db.commit()
 
+        # notification里返回的可能是snapshot, 也可能是image
         self.update_snapshot_status(db, notification, payload)
+        self.update_image_status(db, notification, payload)
         db.close
 
 
@@ -239,6 +242,21 @@ class GlanceWorker(Worker):
                 snapshot.deleted_at = datetime.datetime.now()
 
             db.add(snapshot)
+            db.commit()
+   
+
+    def update_image_status(self, db, notification, payload):
+        image = db.query(Image).filter(Image.image_id==notification.snapshot_id).first()
+        if image:
+            image.status = notification.status
+            image.size = payload.get('size', 0)
+            image.updated_at = datetime.datetime.now()
+
+            if image.status == 'deleted':
+                image.deleted = 1
+                image.deleted_at = datetime.datetime.now()
+
+            db.add(image)
             db.commit()
    
 

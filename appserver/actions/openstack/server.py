@@ -103,15 +103,6 @@ def update_flavor(req, db, context, flavor_id):
     return {'flavor': flavor.to_dict()}
 
 
-# ---------------------- Image related ---------------------------
-
-@pre_check
-@openstack_call
-def list_image(req, db, context):
-    objs = nova_client().images.list()
-    return {'images': [o.to_dict() for o in objs if o]}
-
-
 # ---------------------- Server related ---------------------------
 
 @pre_check
@@ -209,6 +200,10 @@ def create_server(req, db, context):
 @openstack_call
 def delete_server(req, db, context, server_id):
     server = find_server(db, context, server_id);
+    server.stae = 'deleting'
+    db.add(server)
+    db.commit()
+
     try:
         nova_client().servers.delete(server.instance_id)
     except nv_ex.NotFound, e:

@@ -96,13 +96,16 @@ def create_volume(req, db, context):
 @openstack_call
 def delete_volume(req, db, context, id):
     volume = find_volume(db, context, id)
+    volume.status = 'deleting'
+    db.add(volume)
+    db.commit()
+
     try:
         cinder_client().volumes.delete(volume.volume_id)
     except ci_ex.NotFound, e:
         # volume在openstack中已被删除
         volume.deleted = 1
         volume.deleted_at = datetime.datetime.now()
-        volume.status = 'deleting'
         db.add(volume)
         db.commit()
 

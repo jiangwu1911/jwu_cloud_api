@@ -63,6 +63,10 @@ def show_snapshot(req, db, context, snapshot_id):
 @openstack_call
 def delete_snapshot(req, db, context, id):
     snapshot = find_snapshot(db, context, id)
+    snapshot.status = 'deleting'
+    db.add(snapshot)
+    db.commit()
+
     try:
         glance_client().images.delete(snapshot.snapshot_id)
     except gl_ex.NotFound: 

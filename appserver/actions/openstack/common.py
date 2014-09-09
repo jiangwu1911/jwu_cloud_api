@@ -76,9 +76,9 @@ def openstack_call(func):
             log.error(e)
             raise CannotConnectToOpenStackError()
 
-        except (nv_ex.ClientException, nv_ex.CommandError, nv_ex.BadRequest,
-                ci_ex.ClientException, ci_ex.CommandError, ci_ex.BadRequest,
-                gl_ex.ClientException, gl_ex.CommandError, gl_ex.BadRequest) as e:
+        except (nv_ex.ClientException, nv_ex.CommandError, nv_ex.BadRequest, nv_ex.NoUniqueMatch,
+                ci_ex.ClientException, ci_ex.CommandError, ci_ex.BadRequest, ci_ex.NoUniqueMatch,
+                gl_ex.ClientException, gl_ex.CommandError, gl_ex.BadRequest, gl_ex.NoUniqueMatch) as e:
             raise OpenStackError(e)
 
     return _deco

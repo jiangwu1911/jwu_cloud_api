@@ -101,7 +101,7 @@ def define_route(app):
     #----------- OpenStack image related ----------
     @app.get('/images')
     def list_image(db):
-        return server.list_image(request, db)
+        return image.list_image(request, db)
 
     @app.get('/images/:image_id')
     def show_image(db, image_id):

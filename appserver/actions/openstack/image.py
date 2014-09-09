@@ -3,6 +3,7 @@
 import traceback
 import datetime
 import os
+from os.path import getsize
 import thread
 
 import logging
@@ -28,60 +29,116 @@ log = logging.getLogger("cloudapi")
 @pre_check
 @openstack_call
 def list_image(req, db, context):
-    pass
+    images = db.query(Image).filter(Image.deleted==0).all()
+    return obj_array_to_json(images, 'images')
 
 
 def find_image(db, context, image_id):
-    pass
+    image = db.query(Image).filter(Image.deleted==0,
+                                    Image.id==image_id).first()
+    if image == None:
+        raise ImageNotFoundError(image_id)
+    return image
 
 
 @pre_check
 @openstack_call
 def show_image(req, db, context, image_id):
-    pass
+    image = find_image(db, context, image_id)
+    return obj_to_json(image, 'image')
 
 
 @pre_check
 @openstack_call
 def create_image(req, db, context):
-    folder = conf.upload_files_path
-    if os.path.exists(folder) == False:
-        os.mkdir(folder)
-
     if req.POST.imagefile is None:
         raise ImageUploadError('参数imagefile不存在')
         
+    # image文件先保存在临时文件夹
+    folder = conf.upload_files_path
+    if os.path.exists(folder) == False:
+        os.mkdir(folder)
     try:
         dest = '%s/%s' % (folder, req.POST.imagefile.filename)
         req.POST.imagefile.save(dest, overwrite=True)
     except (Exception) as e:
         raise ImageUploadError(e)
 
-    image = glance_client().images.create(name=req.POST.name)
-    data = { 'image_file': dest }
-    thread.start_new_thread(image_update,
-                            (image.id,),
-                            {'data': data})
+    data = { 'name': req.POST.name,
+             'description': '',
+             'source_type': 'file',
+             'image_file': dest,
+             'disk_format': 'qcow2',
+             'architecture': '',
+             'minimum_disk': 0,
+             'minimum_ram': 0,
+             'visibility': 'public',
+             'protected': False }
 
-    image = Image(name = req.POST.name,
-                  image_id = image.id,
-                  status = 'creating',
-                  created_at = datetime.datetime.now())
+    image = glance_client().images.create(container_format="bare",
+                                          disk_format=data['disk_format'],
+                                          visibility=data['visibility'],
+                                          protected=data['protected'],
+                                          min_disk=data['minimum_disk'],
+                                          min_ram=data['minimum_ram'],
+                                          name=data['name']);
+
+    # 上传image文件内容
+    thread.start_new_thread(image_upload,
+                            (image.id, data['image_file']))
+
+    item = Image(name = data['name'],
+                 image_id = image.id,
+                 status = 'creating',
+                 created_at = datetime.datetime.now())
+    db.add(item)
+    db.commit()
+
+    log.debug(item)
+    return "{'success': {'image_id': %d}}" % item.id 
+
+
+def image_upload(image_id, filename):
+    size = getsize(filename)
+    with open(filename, 'rb') as file:
+        return glance_client().images.upload(image_id, file, size)
+
+
+@pre_check
+@openstack_call
+def delete_image(req, db, context, image_id):
+    image = find_image(db, context, image_id)
+    image.status = 'deleting'
     db.add(image)
-    return 'success'
+    db.commit()
 
+    try: 
+        glance_client().images.delete(image.image_id)
+    except gl_ex.NotFound, e:
+        image.deleted = 1
+        image.deleted_at = datetime.datetime.now()
+        db.add(image)
+        db.commit()
 
-def image_update(image_id, **kwargs):
-    return  glance_client().images.update(image_id, None, **kwargs)
-
+    write_operation_log(db,
+                        user_id = context['user'].id,
+                        resource_type = 'image',
+                        resource_id = image_id,
+                        resource_uuid = image.image_id,
+                        event = 'delete image')
+    db.commit()
+ 
 
 @pre_check
 @openstack_call
-def delete_image(req, db, context, id):
-    pass
+def update_image(req, db, context, image_id):
+    image = find_image(db, context, image_id)
+    if image == None:
+        raise ImageNotFoundError(image_id)
 
+    name = get_input(req, 'name')
+    if name:
+        image.name = name
 
-@pre_check
-@openstack_call
-def update_image(req, db, context, id):
-    pass
+    db.add(image)
+    db.commit()
