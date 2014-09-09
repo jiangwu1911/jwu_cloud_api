@@ -43,23 +43,29 @@ def pre_check(func):
         # 调用实际的处理函数
         ret = func(req, db, context, *args)
 
-        response.content_type = "application/json"
+        #response.content_type = "application/json"
         return ret
     return _deco
 
 
+def _get_request_token(req):
+    token = req.get_header('X-Auth-Token')
+    if token is None:
+        token = req.get_cookie('user_token')
+
+    if token is None:
+        raise TokenNotProvidedError
+
+    return token
+    
+    
 def verify_token(req, db, context=None):
     remove_expired_token(db)
 
-    token = req.get_header('X-Auth-Token')
+    token = _get_request_token(req)
     result = db.query(Token).filter(Token.id==token).first() 
-
-    if not token:
-        raise TokenNotProvidedError
-
     if result == None:
         raise TokenNotFoundError(token)
-
     if result.expires < datetime.datetime.now():
         raise TokenExpiredError(token)
 
@@ -97,7 +103,7 @@ def check_permission(req, db, context):
     
 
 def get_user_by_token(req, db):
-    token = req.get_header('X-Auth-Token')
+    token = _get_request_token(req)
     result = db.query(Token).filter(Token.id==token).first()
     if result == None:
         raise TokenNotFoundError(token)

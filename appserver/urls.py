@@ -9,6 +9,7 @@ from actions.openstack import server
 from actions.openstack import volume
 from actions.openstack import snapshot
 from actions.openstack import host
+from actions.openstack import image
 import model
 import utils
 
@@ -114,6 +115,22 @@ def define_route(app):
     @app.get('/images')
     def list_image(db):
         return server.list_image(request, db)
+
+    @app.get('/images/:image_id')
+    def show_image(db, image_id):
+        return image.show_image(request, db, image_id)
+
+    @app.post('/images')
+    def create_image(db):
+        return image.create_image(request, db)
+
+    @app.post('/images/:image_id')
+    def update_image(db, image_id):
+        return image.update_image(request, db, image_id)
+
+    @app.delete('/images/:image_id')
+    def delete_image(db, image_id):
+        return image.delete_image(request, db, image_id)
  
 
     #----------- OpenStack server related ----------
@@ -126,7 +143,7 @@ def define_route(app):
         return server.show_server(request, db, server_id)
 
     @app.post('/servers')
-    def list_server(db):
+    def create_server(db):
         return server.create_server(request, db)
 
     @app.post('/servers/:server_id')

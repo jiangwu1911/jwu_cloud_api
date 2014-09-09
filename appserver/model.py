@@ -239,7 +239,7 @@ class Volume(Base, JsonObj):
     volume_id = Column(String(100), nullable=False)
     status = Column(String(100))
     size = Column(Integer)
-    attached_to = Column(String(100))
+    attached_to = Column(Integer)
     fault = Column(String(500))
     deleted = Column(Integer)
     created_at = Column(DateTime)
@@ -247,7 +247,7 @@ class Volume(Base, JsonObj):
     deleted_at = Column(DateTime)
 
     def __init__(self, creator='', owner=0, dept=0, name='', volume_id='',
-                 status='', size=0, attached_to='', fault='', deleted=0,
+                 status='', size=0, attached_to=0, fault='', deleted=0,
                  created_at='0000-00-00 00:00:00', 
                  updated_at='0000-00-00 00:00:00',
                  deleted_at='0000-00-00 00:00:00'):
@@ -266,7 +266,7 @@ class Volume(Base, JsonObj):
         self.deleted_at = deleted_at
 
     def __repr__(self):
-        return("<Volume(%d, %d, %d, '%s', '%s', '%s', %d, '%s', %d, '%s', '%s', '%s', '%s')>"
+        return("<Volume(%d, %d, %d, '%s', '%s', '%s', %d, %d, '%s', %d, '%s', '%s', '%s')>"
              % (self.creator,
                 self.owner,
                 self.dept,
@@ -448,6 +448,48 @@ class Snapshot(Base, JsonObj):
                 self.name,
                 self.snapshot_id,
                 self.server_id,
+                self.status,
+                self.size,
+                self.fault,
+                self.deleted,
+                self.created_at,
+                self.updated_at,
+                self.deleted_at))
+
+
+class Image(Base, JsonObj):
+    """Image in OpenStack"""
+    __tablename__ = 'image'
+    id = Column(Integer, Sequence('seq_pk'), primary_key=True)
+    name = Column(String(100), nullable=False)
+    image_id = Column(String(100), nullable=False)
+    status = Column(String(100))
+    size = Column(Integer)
+    fault = Column(String(500))
+    deleted = Column(Integer)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    deleted_at = Column(DateTime)
+
+    def __init__(self, name='', image_id='', status='', size=0, fault='', deleted=0,
+                 created_at='0000-00-00 00:00:00',
+                 updated_at='0000-00-00 00:00:00',
+                 deleted_at='0000-00-00 00:00:00'):
+        self.name = name
+        self.image_id = image_id
+        self.status = status
+        self.size = size
+        self.fault = fault
+        self.deleted = deleted
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.deleted_at = deleted_at
+
+    def __repr__(self):
+        return("<Image(%d, '%s', '%s', '%s', %d, '%s', %d, '%s', '%s', '%s')>"
+             % (self.id,
+                self.name,
+                self.image_id,
                 self.status,
                 self.size,
                 self.fault,

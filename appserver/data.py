@@ -135,10 +135,6 @@ def insert_test_data(engine):
     session.add(Permission(path='^/flavors/.*', role_id=sys_admin_role.id, method='POST'))
     session.add(Permission(path='^/flavors/.*', role_id=sys_admin_role.id, method='DELETE'))
 
-    session.add(Permission(path='^/images$', role_id=sys_admin_role.id, method='GET'))
-    session.add(Permission(path='^/images$', role_id=dept_admin_role.id, method='GET'))
-    session.add(Permission(path='^/images$', role_id=user_role.id, method='GET'))
-
     session.add(Permission(path='^/servers$', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/servers$', role_id=dept_admin_role.id, method='GET'))
     session.add(Permission(path='^/servers$', role_id=user_role.id, method='GET'))
@@ -198,6 +194,18 @@ def insert_test_data(engine):
     session.add(Permission(path='^/snapshots/.*', role_id=sys_admin_role.id, method='DELETE'))
     session.add(Permission(path='^/snapshots/.*', role_id=dept_admin_role.id, method='DELETE'))
     session.add(Permission(path='^/snapshots/.*', role_id=user_role.id, method='DELETE'))
+
+    session.add(Permission(path='^/images$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/images$', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/images$', role_id=user_role.id, method='GET'))
+
+    session.add(Permission(path='^/images/.*', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/images/.*', role_id=dept_admin_role.id, method='GET'))
+    session.add(Permission(path='^/images/.*', role_id=user_role.id, method='GET'))
+
+    session.add(Permission(path='^/images$', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/images/.*', role_id=sys_admin_role.id, method='POST'))
+    session.add(Permission(path='^/images/.*', role_id=sys_admin_role.id, method='DELETE'))
 
     session.add(Permission(path='^/hosts$', role_id=sys_admin_role.id, method='GET'))
 

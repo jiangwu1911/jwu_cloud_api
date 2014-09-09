@@ -15,6 +15,12 @@ class DatabaseError(HTTPError):
         super(DatabaseError, self).__init__(500, msg)
 
 
+class UploadFolderNotSetError(HTTPError):
+    def __init__(self, msg):
+        msg = "服务器没有设置上传目录" 
+        super(UploadFolderNotSetError, self).__init__(500, msg)
+
+
 # ----- Auth related -----
 class UserNotFoundOrPasswordError(HTTPError):
     def __init__(self, username):
@@ -194,8 +200,15 @@ class VolumeNotFoundError(HTTPError):
         super(VolumeNotFoundError, self).__init__(404, msg)
 
 
-#----- OpenStack volume related -----
+#----- OpenStack snapshot related -----
 class SnapshotNotFoundError(HTTPError):
     def __init__(self, snapshot):
         msg = "快照不存在。"
         super(SnapshotNotFoundError, self).__init__(404, msg)
+
+
+#----- OpenStack image related -----
+class ImageUploadError(HTTPError):
+    def __init__(self, error):
+        msg = "上传文件错误: %s" % error
+        super(ImageUploadError, self).__init__(400, msg)
