@@ -29,8 +29,8 @@ def list_host(req, db, context):
         else:
             hosts[host] = {}
             hosts[host]['id'] = r.id
-            hosts[host]['status'] = r.status
+            hosts[host]['hostname'] = r.host
             hosts[host]['state'] = r.state
-            hosts[host]['service'] = ''
+            hosts[host]['service'] = r.binary
 
-    return {'hosts': hosts}
+    return {'hosts': hosts.values()}
