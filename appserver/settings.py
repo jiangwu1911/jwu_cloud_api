@@ -13,7 +13,7 @@ upload_files_path = '/tmp/jwu_cloud_api/'
 static_files_path = '/home/python/jwu_cloud_app/'
 
 openstack_api = {
-    'keystone_url': 'http://192.168.206.10:5000/v2.0',
+    'keystone_url': 'http://192.168.145.21:5000/v2.0',
     'user': 'user01',
     'password': 'abc123',
     'tenant_name': 'project01',
@@ -24,8 +24,8 @@ openstack_api = {
 }
 
 openstack_message_queue = {
-    'host': '192.168.206.10',
+    'host': '192.168.145.21',
     'port': 5672,
     'nova_user': 'nova',
-    'nova_password': 'hTTCIVbC',
+    'nova_password': 'qBRUxHEb',
 }

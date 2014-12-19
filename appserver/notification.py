@@ -197,7 +197,7 @@ class CinderWorker(Worker):
 
 class GlanceWorker(Worker):
     def get_consumers(self, Consumer, channel):
-        exchange = Exchange('openstack', type='topic', durable=False,
+        exchange = Exchange('glance', type='topic', durable=False,
                             auto_delete=False, internal=False)
         queues = [Queue('cloudapi_glance', exchange,
                         routing_key='notifications.info',
