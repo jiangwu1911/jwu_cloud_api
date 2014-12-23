@@ -18,4 +18,4 @@ log = logging.getLogger("cloudapi")
 @pre_check
 @openstack_call
 def show_log_server_url(req, db, context):
-    return conf.openstack_log_server['url']
+    return {'url': conf.openstack_log_server['url']}
