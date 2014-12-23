@@ -29,3 +29,7 @@ openstack_message_queue = {
     'nova_user': 'nova',
     'nova_password': 'PyPKep6v',
 }
+
+openstack_log_server = {
+    'url': 'http://192.168.145.19:9201/#/dashboard/file/default.json'
+}

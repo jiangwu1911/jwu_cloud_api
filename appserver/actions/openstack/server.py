@@ -280,7 +280,7 @@ def get_console(req, db, server):
         console_type = 'novnc'
 
     ret = nova_client().servers.get_vnc_console(server.instance_id,
-                                              console_type)
+                                                console_type)
     server.console_url = ret['console']['url']
     db.add(server)
     db.commit()

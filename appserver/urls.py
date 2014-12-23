@@ -10,6 +10,7 @@ from actions.openstack import volume
 from actions.openstack import snapshot
 from actions.openstack import host
 from actions.openstack import image
+from actions.openstack import logserver
 import model
 import utils
 import settings as conf
@@ -190,3 +191,8 @@ def define_route(app):
     @app.get('/hosts')
     def list_hypervisor(db):
         return host.list_hypervisor(request, db)
+
+    #----------- View OpenStack logs ----------
+    @app.get('/logs')
+    def show_log_server_url(db):
+        return logserver.show_log_server_url(request, db)
