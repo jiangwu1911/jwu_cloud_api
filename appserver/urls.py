@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from bottle import route, get, post, delete, request, response, hook, static_file
+from bottle import route, get, post, delete, request, response, hook, static_file, redirect
 
 from actions import auth
 from actions import user
@@ -16,6 +16,10 @@ import settings as conf
 
 
 def define_route(app):
+    @app.route('/')
+    def server_index():
+        redirect('/cloudapp/index.html')
+
     @app.route('/cloudapp/:path#.+#')
     def server_static(path):
         return static_file(path, root=conf.static_files_path)

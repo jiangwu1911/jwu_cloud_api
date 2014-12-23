@@ -58,7 +58,9 @@ def start_server():
     app = Bottle()
     install_db_plugin(app)
     urls.define_route(app)
-    httpserver.serve(app, host=conf.listen_ip, port=conf.listen_port)
+    httpserver.serve(app, host=conf.listen_ip, port=conf.listen_port,
+                     threadpool_workers=30,
+                     request_queue_size=20)
 
 
 def start_notify_listener():
