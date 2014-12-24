@@ -10,3 +10,6 @@ python-glanceclient>=0.13.1
 python-keystoneclient>=0.10.1
 kombu>=3.0.21
 librabbitmq>=1.5.2
+elasticsearch>=1.2.0
+nose
+python-dateutil
