@@ -212,3 +212,15 @@ class ImageUploadError(HTTPError):
     def __init__(self, error):
         msg = "上传文件错误: %s" % error
         super(ImageUploadError, self).__init__(400, msg)
+
+
+#----- Monitor server (ElasticSearch) error -----
+class MonitorServerError(HTTPError):
+    def __init__(self, error):
+        msg = "监控服务器错误: %s" % error
+        super(MonitorServerError, self).__init__(500, msg)
+
+class MonitorDataTypeNotSupportedError(HTTPError):
+    def __init__(self, data_type):
+        msg = "监控数据类型 %s 不支持" % data_type
+        super(MonitorDataTypeNotSupportedError, self).__init__(400, msg)

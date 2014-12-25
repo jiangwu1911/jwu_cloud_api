@@ -11,6 +11,7 @@ from actions.openstack import snapshot
 from actions.openstack import host
 from actions.openstack import image
 from actions.openstack import logserver
+from actions.monitor import monitor
 import model
 import utils
 import settings as conf
@@ -196,3 +197,8 @@ def define_route(app):
     @app.get('/logs')
     def show_log_server_url(db):
         return logserver.show_log_server_url(request, db)
+
+    #----------- Get monitor data ----------
+    @app.get('/monitor/:data_type')
+    def get_monitor_data(db, data_type):
+        return monitor.get_data(request, db, data_type)

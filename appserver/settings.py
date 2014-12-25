@@ -33,3 +33,5 @@ openstack_message_queue = {
 openstack_log_server = {
     'url': 'http://192.168.145.19:9201/#/dashboard/file/default.json'
 }
+
+#monitor_server = ['http://192.168.145.152:9200']
