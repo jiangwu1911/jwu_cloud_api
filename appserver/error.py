@@ -224,3 +224,8 @@ class MonitorDataTypeNotSupportedError(HTTPError):
     def __init__(self, data_type):
         msg = "监控数据类型 %s 不支持" % data_type
         super(MonitorDataTypeNotSupportedError, self).__init__(400, msg)
+
+class MonitorDataNotFoundError(HTTPError):
+    def __init__(self):
+        msg = "未找到监控数据"
+        super(MonitorDataNotFoundError, self).__init__(400, msg)

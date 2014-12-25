@@ -37,12 +37,27 @@ class MonitorTestCase(BaseTestCase):
         self.assertEqual(error['code'], "400", 'test_get_data_data_type_not_supported failed')
 
 
-    def test_get_data(self):
+    def test_get_data_without_host(self):
         content = self.get_token('admin', 'admin')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
         resp, content = h.request(self.base_url + "monitor/cpu",
                                   "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        error = json.loads(content)['error']
+        self.assertEqual(error['code'], "400", 'test_get_data_without_host')
+
+
+    def test_get_data_cpu(self):
+        content = self.get_token('admin', 'admin')
+        token = json.loads(content)['success']['token']
+        data = {'host': 'logclient'}
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "monitor/cpu",
+                                  "GET",
+                                  urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
                                  )

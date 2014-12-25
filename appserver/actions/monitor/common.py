@@ -11,7 +11,7 @@ import settings as conf
 
 log = logging.getLogger("cloudapi")
 
-def connect():
+def connect_to_elasticsearch():
     return Elasticsearch(conf.monitor_server)
 
 
