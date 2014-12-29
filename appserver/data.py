@@ -208,6 +208,7 @@ def insert_test_data(engine):
     session.add(Permission(path='^/images/.*', role_id=sys_admin_role.id, method='DELETE'))
 
     session.add(Permission(path='^/hypervisors$', role_id=sys_admin_role.id, method='GET'))
+    session.add(Permission(path='^/hosts$', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/logs$', role_id=sys_admin_role.id, method='GET'))
     session.add(Permission(path='^/monitor/.*', role_id=sys_admin_role.id, method='GET'))
 

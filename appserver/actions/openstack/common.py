@@ -52,6 +52,17 @@ def cinder_client():
     return var
 
 
+def admin_cinder_client():
+    var = getattr(localdata, 'admin_cinder_client', None)
+    if var is None:
+        var = ciclient.Client(auth_url = conf.openstack_api['keystone_url'],
+                              username = conf.openstack_api['admin_user'],
+                              api_key = conf.openstack_api['admin_password'],
+                              project_id = conf.openstack_api['admin_tenant_name'])
+        setattr(localdata, 'admin_cinder_client', var)
+    return var
+
+
 def glance_client():
     var = getattr(localdata, 'glance_client', None)
     if var is None:

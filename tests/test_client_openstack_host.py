@@ -15,7 +15,7 @@ class OpenStackHostTestCase(BaseTestCase):
         content = self.get_token('熊大', 'abc123')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "hosts",
+        resp, content = h.request(self.base_url + "hypervisors",
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -28,7 +28,7 @@ class OpenStackHostTestCase(BaseTestCase):
         content = self.get_token('admin', 'admin')
         token = json.loads(content)['success']['token']
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "hosts",
+        resp, content = h.request(self.base_url + "hypervisors",
                                   "GET",
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
                                            'X-Auth-Token': token}
@@ -43,7 +43,7 @@ class OpenStackHostTestCase(BaseTestCase):
         token = json.loads(content)['success']['token']
         data = {'action': 'stats'}
         h = httplib2.Http()
-        resp, content = h.request(self.base_url + "hosts",
+        resp, content = h.request(self.base_url + "hypervisors",
                                   "GET",
                                   urlencode(data),
                                   headers={'Content-Type': 'application/x-www-form-urlencoded',
@@ -52,6 +52,21 @@ class OpenStackHostTestCase(BaseTestCase):
         print content
         data = json.loads(content)['hypervisor_stats']
         self.assertTrue(len(data)>=1, 'test_list_hypervisor failed')
+
+
+    def test_list_host(self):
+        content = self.get_token('admin', 'admin')
+        token = json.loads(content)['success']['token']
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "hosts",
+                                  "GET",
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+        print content
+        #hypervisors = json.loads(content)['hosts']
+        #self.assertTrue(len(hypervisors)>=1, 'test_list_hypervisor failed')
+
 
 
 if __name__ == "__main__":
