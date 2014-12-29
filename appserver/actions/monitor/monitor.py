@@ -2,6 +2,7 @@
 
 import traceback
 import datetime
+from time import *
 
 import logging
 from actions.monitor.common import *
@@ -25,15 +26,15 @@ def get_data(req, db, context, data_type):
 
     from_time = get_input(req, "from_time")
     if from_time==None or from_time=='':
-        from_time = "now-30m"
+        from_time = get_current_time() - 1800       # 缺省查询30分钟的数据
 
     to_time = get_input(req, "to_time")
     if to_time==None or to_time=='':
-        to_time = "now"
+        to_time = get_current_time()              
 
     interval = get_input(req, "interval")
     if interval==None or interval=='':
-        interval = "1m"
+        interval = 30                               # 缺省间隔30秒
 
     if data_type == "cpu":
         return get_cpu_data(host, from_time, to_time, interval)
@@ -43,9 +44,24 @@ def get_data(req, db, context, data_type):
         return get_load_data(host, from_time, to_time, interval)
 
 
+def get_current_time():
+    return time()
+
+
+# 发现ES中,如果输入的时间没按interval对齐,查询出的数据不准确
+# adjust_time将时间按interval对其
+# 输入输出参数单位都是秒,注意在ES中,需要将其乘以1000使用
+def adjust_time(t, interval):
+    return int(t / interval) * interval
+
+
 def get_cpu_data(host, from_time, to_time, interval):
+    from_time = adjust_time(from_time, interval) * 1000
+    to_time = adjust_time(to_time, interval) * 1000
+    interval = interval * 1000
     es = connect_to_elasticsearch()
     querys = []
+
     cpu_ids = _get_cpu_ids(es, host)
     for cpu_id in cpu_ids:
         for type in ('idle', 'user', 'system'):
@@ -54,7 +70,8 @@ def get_cpu_data(host, from_time, to_time, interval):
             querys.append(q)
 
     results = es.msearch(body=querys)
-    print results
+    graph_data = _parse_cpu_search_result(results)
+    print graph_data
 
 
 def _get_cpu_ids(es, host):
@@ -126,6 +143,34 @@ def _build_es_search_body(facet_name, query_string, host, from_time, to_time, in
         },
         "size": 0
     }
+
+
+def _parse_cpu_search_result(results):
+    graph_data = {}
+
+    for r in results['responses']:
+        for k in r['facets'].keys():
+            graph = []
+            for item in r['facets'][k]['entries']:
+                graph.append({'date': item['time'],
+                              'value': item['mean']})
+            # 排序
+            graph.sort(lambda x,y : cmp(x['date'], y['date']))
+
+            # 求差值
+            new_graph = []
+            last_point = None
+            for point in graph:
+                if last_point != None:
+                    p = {}
+                    p['date'] = strftime("%Y-%m-%d %H:%M:%S", localtime(point['date']/1000))
+                    p['value'] = (point['value'] - last_point['value']) * 1000 / \
+                                 (point['date'] - last_point['date'])
+                    new_graph.append(p)
+                last_point = point
+
+            graph_data[k] = new_graph
+    print graph_data
 
 
 def get_memory_data(req, db, context):
