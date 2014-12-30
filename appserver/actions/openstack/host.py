@@ -25,7 +25,7 @@ def list_host(req, db, context):
     for r in (results + results1):
         host = r.host
         if hosts.has_key(host):
-            hosts[host]['service'] += ', %s' % r.binary
+            hosts[host]['service'] += '<br>%s' % r.binary
         else:
             hosts[host] = {}
             hosts[host]['id'] = r.id

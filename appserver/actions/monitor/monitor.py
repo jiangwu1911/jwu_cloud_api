@@ -22,7 +22,7 @@ def get_data(req, db, context, data_type):
     if data_type not in supported_datatype:
         raise MonitorDataTypeNotSupportedError(data_type)     
 
-    host = get_required_input(req, 'host')
+    host = get_required_input(req, 'hostname')
 
     from_time = get_input(req, "from_time")
     if from_time==None or from_time=='':
@@ -70,8 +70,7 @@ def get_cpu_data(host, from_time, to_time, interval):
             querys.append(q)
 
     results = es.msearch(body=querys)
-    graph_data = _parse_cpu_search_result(results)
-    print graph_data
+    return {'cpustats': _parse_cpu_search_result(results)}
 
 
 def _get_cpu_ids(es, host):
@@ -168,9 +167,32 @@ def _parse_cpu_search_result(results):
                                  (point['date'] - last_point['date'])
                     new_graph.append(p)
                 last_point = point
-
             graph_data[k] = new_graph
-    print graph_data
+
+    # 目前为方便起见，把所有数据合成一个图，横坐标是时间，纵坐标是所有cpu的system+user/system+user+idle
+    chart_data = {}
+    for k in graph_data.keys():
+        for g in graph_data[k]:
+            t = g['date']
+            if not chart_data.has_key(t):
+                chart_data[t] = {}
+                chart_data[t]['date'] = t
+                chart_data[t]['used'] = 0
+                chart_data[t]['total'] = 0
+
+            if k.find('system')>0 or k.find('user')>0:
+                chart_data[t]['used'] += g['value']
+            chart_data[t]['total'] += g['value'] 
+
+    return_data = []
+    for c in chart_data.values():
+        point = {}
+        point['date'] = c['date']
+        point['value'] = c['used'] * 100 / c['total']
+        return_data.append(point)
+    
+    return_data.sort(lambda x,y : cmp(x['date'], y['date']))
+    return return_data
 
 
 def get_memory_data(req, db, context):

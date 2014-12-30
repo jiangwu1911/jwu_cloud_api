@@ -53,7 +53,7 @@ class MonitorTestCase(BaseTestCase):
     def test_get_data_cpu(self):
         content = self.get_token('admin', 'admin')
         token = json.loads(content)['success']['token']
-        data = {'host': 'logclient'}
+        data = {'hostname': 'logclient'}
         h = httplib2.Http()
         resp, content = h.request(self.base_url + "monitor/cpu",
                                   "GET",
