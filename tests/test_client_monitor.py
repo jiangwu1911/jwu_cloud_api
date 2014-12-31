@@ -50,7 +50,7 @@ class MonitorTestCase(BaseTestCase):
         self.assertEqual(error['code'], "400", 'test_get_data_without_host')
 
 
-    def test_get_data_cpu(self):
+    def atest_get_data_cpu(self):
         content = self.get_token('admin', 'admin')
         token = json.loads(content)['success']['token']
         data = {'hostname': 'logclient'}
@@ -62,6 +62,20 @@ class MonitorTestCase(BaseTestCase):
                                            'X-Auth-Token': token}
                                  )
         print content
+
+
+    def test_get_data_memory(self):
+        content = self.get_token('admin', 'admin')
+        token = json.loads(content)['success']['token']
+        data = {'hostname': 'logclient'}
+        h = httplib2.Http()
+        resp, content = h.request(self.base_url + "monitor/memory",
+                                  "GET",
+                                  urlencode(data),
+                                  headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                           'X-Auth-Token': token}
+                                 )
+
 
 
 if __name__ == "__main__":

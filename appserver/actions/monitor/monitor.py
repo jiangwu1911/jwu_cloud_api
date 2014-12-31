@@ -24,17 +24,23 @@ def get_data(req, db, context, data_type):
 
     host = get_required_input(req, 'hostname')
 
-    from_time = int(get_input(req, "from_time"))
+    from_time = get_input(req, "from_time")
     if from_time==None or from_time=='':
-        from_time = get_current_time() - 1800       # 缺省查询30分钟的数据
+        from_time = (get_current_time() - 600) * 1000      # 缺省查询10分钟的数据
+    else: 
+        from_time = int(from_time)
 
-    to_time = int(get_input(req, "to_time"))
+    to_time = get_input(req, "to_time")
     if to_time==None or to_time=='':
-        to_time = get_current_time()              
+        to_time = get_current_time() * 1000              
+    else: 
+        to_time = int(to_time)
 
-    interval = int(get_input(req, "interval"))
+    interval = get_input(req, "interval")
     if interval==None or interval=='':
-        interval = 30                               # 缺省间隔30秒
+        interval = 60 * 1000                                # 缺省间隔1分钟
+    else:
+        interval = int(interval)
 
     if data_type == "cpu":
         return get_cpu_data(host, from_time, to_time, interval)
@@ -143,9 +149,8 @@ def _build_es_search_body(facet_name, query_string, host, from_time, to_time, in
     }
 
 
-def _parse_cpu_search_result(results):
+def _results_to_graph_data(results):
     graph_data = {}
-
     for r in results['responses']:
         for k in r['facets'].keys():
             graph = []
@@ -167,7 +172,11 @@ def _parse_cpu_search_result(results):
                     new_graph.append(p)
                 last_point = point
             graph_data[k] = new_graph
+    return graph_data
 
+
+def _parse_cpu_search_result(results):
+    graph_data = _results_to_graph_data(results)
     # 目前为方便起见，把所有数据合成一个图，横坐标是时间，纵坐标是所有cpu的system+user/system+user+idle
     chart_data = {}
     for k in graph_data.keys():
@@ -194,7 +203,28 @@ def _parse_cpu_search_result(results):
     return return_data
 
 
-def get_memory_data(req, db, context):
+def get_memory_data(host, from_time, to_time, interval):
+    from_time = adjust_time(from_time, interval)
+    to_time = adjust_time(to_time, interval)
+    es = connect_to_elasticsearch()
+    querys = []
+
+    for type in ('cached', 'used', 'buffered', 'free'):
+        q = _build_es_search_body_for_memory(host, type, from_time, to_time, interval)
+        querys.append({})
+        querys.append(q)
+
+    results = es.msearch(body=querys)
+    print results
+
+
+def _build_es_search_body_for_memory(host, type, from_time, to_time, interval):
+    facet_name = "facet_%s" % (type)
+    query_string = "plugin:memory AND type_instance:%s" % (type)
+    return _build_es_search_body(facet_name, query_string, host, from_time, to_time, interval)
+
+
+def _parse_memory_search_result(results):
     pass
 
 
