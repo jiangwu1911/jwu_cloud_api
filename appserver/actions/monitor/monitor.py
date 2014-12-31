@@ -24,15 +24,15 @@ def get_data(req, db, context, data_type):
 
     host = get_required_input(req, 'hostname')
 
-    from_time = get_input(req, "from_time")
+    from_time = int(get_input(req, "from_time"))
     if from_time==None or from_time=='':
         from_time = get_current_time() - 1800       # 缺省查询30分钟的数据
 
-    to_time = get_input(req, "to_time")
+    to_time = int(get_input(req, "to_time"))
     if to_time==None or to_time=='':
         to_time = get_current_time()              
 
-    interval = get_input(req, "interval")
+    interval = int(get_input(req, "interval"))
     if interval==None or interval=='':
         interval = 30                               # 缺省间隔30秒
 
@@ -56,9 +56,8 @@ def adjust_time(t, interval):
 
 
 def get_cpu_data(host, from_time, to_time, interval):
-    from_time = adjust_time(from_time, interval) * 1000
-    to_time = adjust_time(to_time, interval) * 1000
-    interval = interval * 1000
+    from_time = adjust_time(from_time, interval)
+    to_time = adjust_time(to_time, interval)
     es = connect_to_elasticsearch()
     querys = []
 
